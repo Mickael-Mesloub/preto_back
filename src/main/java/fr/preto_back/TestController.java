@@ -1,7 +1,7 @@
 package fr.preto_back;
 
-import fr.preto_back.shared.ApiCode;
-import fr.preto_back.shared.ApiResponse;
+import fr.preto_back.shared.api_response.ApiCode;
+import fr.preto_back.shared.api_response.ApiResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
