@@ -1,0 +1,10 @@
+insert into category (name) values ('IT_EQUIPMENT');
+insert into category (name) values ('AUDIOVISUAL');
+insert into category (name) values ('TESTING_EQUIPMENT');
+insert into category (name) values ('TOOLS');
+insert into category (name) values ('FURNITURE');
+insert into category (name) values ('VEHICLE');
+insert into category (name) values ('ROOM');
+insert into category (name) values ('MEDIA');
+insert into category (name) values ('OFFICE_SUPPLIES');
+insert into category (name) values ( 'OTHER');
