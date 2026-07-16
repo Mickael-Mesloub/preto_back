@@ -35,13 +35,12 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(error -> new ApiValidationError(
                         error.getField(),
-                        error.getCode(),
                         error.getDefaultMessage()
                 ))
                 .toList();
 
         errors.forEach(error -> {
-            log.debug("Validation failed - field={}, messageKey={}, messageValue={}", error.getField(), error.getMessageKey(), error.getMessageValue());
+            log.warn("Validation failed - field={}, validationErrorMessageKey={}", error.getField(), error.getValidationErrorMessageKey());
         });
 
         return ResponseEntity.badRequest().body(

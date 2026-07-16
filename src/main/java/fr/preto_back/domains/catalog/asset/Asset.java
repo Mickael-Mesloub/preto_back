@@ -6,8 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -31,13 +29,10 @@ public class Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "title", nullable = false)
-    @NotBlank(message = "{VALIDATION_ASSET_TITLE_REQUIRED}")
-    @Size(min = 3, max = 255, message = "{VALIDATION_ASSET_TITLE_SIZE}")
+    @Column(name = "title", nullable = false, length = 60)
     private String title;
 
     @Column(name = "description", length = 1000)
-    @Size(max = 1000, message = "{VALIDATION_ASSET_DESCRIPTION_SIZE}")
     private String description;
 
     @Column(name = "image_url")

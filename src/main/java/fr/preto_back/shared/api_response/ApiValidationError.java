@@ -7,6 +7,5 @@ import lombok.Getter;
 @Getter
 public class ApiValidationError {
     private String field;
-    private String messageKey;
-    private String messageValue;
+    private String validationErrorMessageKey;
 }
