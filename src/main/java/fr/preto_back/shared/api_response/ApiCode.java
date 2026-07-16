@@ -13,9 +13,12 @@ public enum ApiCode {
     ASSET_NULL("No asset provided"),
     ASSET_SAVE_SUCCESS("Asset saved successfully"),
     ASSET_SAVE_FAILED("Asset save failed"),
+    ASSET_NOT_FOUND("Asset not found"),
+    ASSET_UPDATE_SUCCESS("Asset updated successfully"),
+    ASSET_DELETE_SUCCESS("Asset deleted successfully"),
 
     // Category errors
-    CATEGORY_NOT_FOUND("Category not found"),;
+    CATEGORY_NOT_FOUND("Category not found");
 
     private final String message;
 

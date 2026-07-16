@@ -18,7 +18,7 @@ public class ApiResponse<T> {
     public T data;
     public List<ApiValidationError> errors;
 
-    // Success response
+    // Success response with data
     public static <T> ApiResponse<T> success(String code, String message, T data) {
         return ApiResponse.<T>builder()
                 .success(true)
