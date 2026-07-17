@@ -7,6 +7,10 @@ import fr.preto_back.shared.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+import static fr.preto_back.utils.StringUtils.trimOrNull;
+
 @AllArgsConstructor
 @Service
 public class AssetService {
@@ -20,12 +24,23 @@ public class AssetService {
 
         Asset newAsset = Asset.builder()
                 .title(assetDTO.getTitle().trim())
-                .description(assetDTO.getDescription().trim())
-                .imageUrl(assetDTO.getImageUrl().trim())
+                .description(trimOrNull(assetDTO.getDescription()))
+                .imageUrl(trimOrNull(assetDTO.getImageUrl()))
                 .category(category)
                 .build();
 
        return assetRepository.save(newAsset);
+
+       // TODO : create AssetCopy
+    }
+
+    public List<Asset> findAllAssets() {
+        return assetRepository.findAll();
+    }
+
+    public Asset findAssetById(int assetId) {
+        return assetRepository.findById(assetId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
     }
 
     public Asset updateAsset(int assetId, AssetDTO assetDTO) {
@@ -50,15 +65,10 @@ public class AssetService {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
+        // TODO : loop through all asset copies linked to this asset
+        // TODO     and delete them + the asset only if no loan is active
+
         assetRepository.deleteById(assetId);
     }
-
-    /*public ResponseEntity<ApiResponse<List<Asset>>> findAll() {
-        try {
-
-        } catch (
-
-        )
-    }*/
 
 }

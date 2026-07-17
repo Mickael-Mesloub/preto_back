@@ -4,20 +4,23 @@ import lombok.Getter;
 
 @Getter
 public enum ApiCode {
-    // Common errors
+    // Common
     TEST("Test response message"),
     INTERNAL_SERVER_ERROR("An unexpected error occurred"),
     VALIDATION_ERROR("Validation failed"),
+    INVALID_REQUEST_BODY("Request body is missing or invalid"),
 
-    // Asset errors
+    // Asset
     ASSET_NULL("No asset provided"),
     ASSET_SAVE_SUCCESS("Asset saved successfully"),
     ASSET_SAVE_FAILED("Asset save failed"),
     ASSET_NOT_FOUND("Asset not found"),
     ASSET_UPDATE_SUCCESS("Asset updated successfully"),
     ASSET_DELETE_SUCCESS("Asset deleted successfully"),
+    ASSETS_FOUND_SUCCESS("Assets found"),
+    ASSET_FOUND_SUCCESS("Asset found"),
 
-    // Category errors
+    // Category
     CATEGORY_NOT_FOUND("Category not found");
 
     private final String message;

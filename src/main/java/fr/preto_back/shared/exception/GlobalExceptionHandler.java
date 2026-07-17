@@ -6,6 +6,7 @@ import fr.preto_back.shared.api_response.ApiValidationError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,6 +24,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(e.getStatus())
                 .body(ApiResponse.error(e.getCode().name(), e.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(
+                ApiResponse.error(
+                        ApiCode.INVALID_REQUEST_BODY.name(),
+                        ApiCode.INVALID_REQUEST_BODY.getMessage()
+                )
+        );
     }
 
     // Handles validation errors
