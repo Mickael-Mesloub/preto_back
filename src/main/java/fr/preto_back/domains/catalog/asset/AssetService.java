@@ -17,6 +17,7 @@ public class AssetService {
     private final AssetRepository assetRepository;
     private final CategoryRepository categoryRepository;
 
+    // TODO : Check auth + role
     public Asset createAsset(AssetDTO assetDTO) {
 
         Category category = categoryRepository.findById(assetDTO.getCategoryId())
@@ -43,6 +44,7 @@ public class AssetService {
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
     }
 
+    // TODO : Check auth + role
     public Asset updateAsset(int assetId, AssetDTO assetDTO) {
         // Check if asset with assetid provided exists. If not, throw custom Not found exception
         Asset existingAsset = assetRepository.findById(assetId)
@@ -61,6 +63,7 @@ public class AssetService {
         return assetRepository.save(existingAsset);
     }
 
+    // TODO : Check auth + role
     public void deleteAsset(int assetId) {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
