@@ -1,10 +1,14 @@
-package fr.preto_back.domains.catalog.category;
+package fr.preto_back.domains.catalog.assetcopy;
 
-import jakarta.persistence.Column;
+import fr.preto_back.domains.catalog.asset.Asset;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,12 +27,18 @@ import lombok.ToString;
 @EqualsAndHashCode
 
 @Entity
-@Table(name = "CATEGORY")
-public class Category {
+@Table(name = "ASSET_COPY")
+public class AssetCopy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "NAME", nullable = false, length = 100, unique = true)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "ASSET_ID", referencedColumnName = "id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Asset asset;
+
+    @Enumerated(EnumType.STRING)
+    private AssetCopyState state;
 }

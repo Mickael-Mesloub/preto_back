@@ -1,10 +1,15 @@
 package fr.preto_back.domains.catalog.asset;
 
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyDTO;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyRequest;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyService;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.catalog.category.Category;
 import fr.preto_back.domains.catalog.category.CategoryRepository;
 import fr.preto_back.shared.api_response.ApiCode;
 import fr.preto_back.shared.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +18,14 @@ import static fr.preto_back.utils.StringUtils.trimOrNull;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class AssetService {
     private final AssetRepository assetRepository;
     private final CategoryRepository categoryRepository;
+    private final AssetCopyService assetCopyService;
+
+    // TODO : Replace AssetDTO by AssetRequest
+    // TODO : Replace return type Asset by AssetDTO and use AssetMapper toDto() method for mapping
 
     // TODO : Check auth + role
     public Asset createAsset(AssetDTO assetDTO) {
@@ -30,9 +40,16 @@ public class AssetService {
                 .category(category)
                 .build();
 
-       return assetRepository.save(newAsset);
+       Asset savedAsset = assetRepository.save(newAsset);
+       AssetCopyRequest assetCopyRequest = AssetCopyRequest.builder()
+               .state(AssetCopyState.NEW)
+               .build();
 
-       // TODO : create AssetCopy
+       // Create copy for the new asset
+        AssetCopyDTO createdCopy = assetCopyService.createAssetCopy(savedAsset.getId(), assetCopyRequest);
+        log.info("Asset copy has been created: {}", createdCopy);
+
+        return savedAsset;
     }
 
     public List<Asset> findAllAssets() {
