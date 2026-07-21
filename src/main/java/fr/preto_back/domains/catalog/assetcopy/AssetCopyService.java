@@ -14,13 +14,13 @@ import java.util.List;
 public class AssetCopyService {
     private final AssetCopyRepository assetCopyRepository;
     private final AssetRepository assetRepository;
-    AssetCopyMapper mapper;
+    private final AssetCopyMapper mapper;
 
     public List<AssetCopyDTO> findAllAssetCopies() {
         List<AssetCopy> copies = assetCopyRepository.findAll();
 
         return copies.stream()
-                .map(c -> mapper.toDto(c))
+                .map(mapper::toDto)
                 .toList();
     }
 
@@ -38,7 +38,7 @@ public class AssetCopyService {
         List<AssetCopy> assetCopies = assetCopyRepository.findAllByAssetId(existingAsset.getId());
 
         return assetCopies.stream()
-                .map(c -> mapper.toDto(c))
+                .map(mapper::toDto)
                 .toList();
     }
 

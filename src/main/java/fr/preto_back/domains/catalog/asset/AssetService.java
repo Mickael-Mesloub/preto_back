@@ -23,61 +23,67 @@ public class AssetService {
     private final AssetRepository assetRepository;
     private final CategoryRepository categoryRepository;
     private final AssetCopyService assetCopyService;
-
-    // TODO : Replace AssetDTO by AssetRequest
-    // TODO : Replace return type Asset by AssetDTO and use AssetMapper toDto() method for mapping
+    private final AssetMapper mapper;
 
     // TODO : Check auth + role
-    public Asset createAsset(AssetDTO assetDTO) {
+    public AssetDTO createAsset(AssetRequest assetRequest) {
 
-        Category category = categoryRepository.findById(assetDTO.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage()  + " with id " + assetDTO.getCategoryId()));
+        Category category = categoryRepository.findById(assetRequest.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequest.getCategoryId()));
 
-        Asset newAsset = Asset.builder()
-                .title(assetDTO.getTitle().trim())
-                .description(trimOrNull(assetDTO.getDescription()))
-                .imageUrl(trimOrNull(assetDTO.getImageUrl()))
+        Asset savedAsset = assetRepository.save(Asset.builder()
+                .title(assetRequest.getTitle().trim())
+                .description(trimOrNull(assetRequest.getDescription()))
+                .imageUrl(trimOrNull(assetRequest.getImageUrl()))
                 .category(category)
+                .build());
+
+        AssetCopyRequest assetCopyRequest = AssetCopyRequest.builder()
+                .state(AssetCopyState.NEW)
                 .build();
 
-       Asset savedAsset = assetRepository.save(newAsset);
-       AssetCopyRequest assetCopyRequest = AssetCopyRequest.builder()
-               .state(AssetCopyState.NEW)
-               .build();
-
-       // Create copy for the new asset
+        // Create copy for the new asset
         AssetCopyDTO createdCopy = assetCopyService.createAssetCopy(savedAsset.getId(), assetCopyRequest);
         log.info("Asset copy has been created: {}", createdCopy);
 
-        return savedAsset;
+        return mapper.toDto(savedAsset);
     }
 
-    public List<Asset> findAllAssets() {
-        return assetRepository.findAll();
+    public List<AssetDTO> findAllAssets() {
+        List<Asset> assets = assetRepository.findAll();
+        return assets.stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    public Asset findAssetById(int assetId) {
-        return assetRepository.findById(assetId)
+    public AssetDTO findAssetById(int assetId) {
+        Asset asset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
+
+        return mapper.toDto(asset);
     }
 
     // TODO : Check auth + role
-    public Asset updateAsset(int assetId, AssetDTO assetDTO) {
+    public AssetDTO updateAsset(int assetId, AssetRequest assetRequest) {
         // Check if asset with assetid provided exists. If not, throw custom Not found exception
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
         // Check if category provided exists. If not, throw custom Not found exception
-        Category existingCategory = categoryRepository.findById(assetDTO.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage()  + " with id " + assetDTO.getCategoryId()));
+        Category existingCategory = categoryRepository.findById(assetRequest.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequest.getCategoryId()));
 
         // Update existing asset with new data
-        existingAsset.setTitle(assetDTO.getTitle());
-        existingAsset.setDescription(assetDTO.getDescription());
-        existingAsset.setImageUrl(assetDTO.getImageUrl());
+        existingAsset.setTitle(assetRequest.getTitle());
+        existingAsset.setDescription(assetRequest.getDescription());
+        existingAsset.setImageUrl(assetRequest.getImageUrl());
         existingAsset.setCategory(existingCategory);
 
-        return assetRepository.save(existingAsset);
+        // Save changes in base
+        Asset updatedAsset = assetRepository.save(existingAsset);
+
+        // Map entity to DTO and return DTO to controller, which then returns it to client
+        return mapper.toDto(updatedAsset);
     }
 
     // TODO : Check auth + role
