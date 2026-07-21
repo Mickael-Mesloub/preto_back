@@ -13,7 +13,7 @@ public class AssetCopyMapper {
     ) {
         return AssetCopyDTO.builder()
                 .id(assetCopy.getId())
-                .asset(assetCopy.getAsset())
+                .assetId(assetCopy.getAsset().getId())
                 .state(assetCopy.getState())
                 // .isAvailable(isAvailable)
                 .build();

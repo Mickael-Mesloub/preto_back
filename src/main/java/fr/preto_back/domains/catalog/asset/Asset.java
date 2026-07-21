@@ -20,8 +20,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -54,5 +54,17 @@ public class Asset {
     @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private @Builder.Default Set<AssetCopy> copies = new HashSet<>();
+    private @Builder.Default List<AssetCopy> copies = new ArrayList<>();
+
+    // Method to add copy to the list of copies
+    public void addCopy(AssetCopy copy) {
+        copies.add(copy);
+        copy.setAsset(this);
+    }
+
+    // Method to remove copy from the list of copies
+    public void removeCopy(AssetCopy copy) {
+        copies.remove(copy);
+        copy.setAsset(null);
+    }
 }

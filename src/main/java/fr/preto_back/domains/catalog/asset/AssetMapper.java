@@ -1,5 +1,6 @@
 package fr.preto_back.domains.catalog.asset;
 
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyMapper;
 import fr.preto_back.domains.catalog.category.CategoryDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class AssetMapper {
+    private final AssetCopyMapper assetCopyMapper;
+
     public AssetDTO toDto(Asset asset) {
         return AssetDTO.builder()
                 .id(asset.getId())
@@ -17,6 +20,10 @@ public class AssetMapper {
                         .id(asset.getCategory().getId())
                         .name(asset.getCategory().getName())
                         .build())
+                .copies(asset.getCopies()
+                        .stream()
+                        .map(assetCopyMapper::toDto)
+                        .toList())
                 .build();
     }
 }

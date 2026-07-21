@@ -1,7 +1,8 @@
 package fr.preto_back.domains.catalog.asset;
 
-import fr.preto_back.domains.catalog.assetcopy.AssetCopyDTO;
-import fr.preto_back.domains.catalog.assetcopy.AssetCopyRequest;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyMapper;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyService;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.catalog.category.Category;
@@ -21,9 +22,11 @@ import static fr.preto_back.utils.StringUtils.trimOrNull;
 @Slf4j
 public class AssetService {
     private final AssetRepository assetRepository;
+    private final AssetCopyRepository assetCopyRepository;
     private final CategoryRepository categoryRepository;
     private final AssetCopyService assetCopyService;
-    private final AssetMapper mapper;
+    private final AssetMapper assetMapper;
+    private final AssetCopyMapper assetCopyMapper;
 
     // TODO : Check auth + role
     public AssetDTO createAsset(AssetRequest assetRequest) {
@@ -32,27 +35,28 @@ public class AssetService {
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequest.getCategoryId()));
 
         Asset savedAsset = assetRepository.save(Asset.builder()
-                .title(assetRequest.getTitle().trim())
+                .title(trimOrNull(assetRequest.getTitle()))
                 .description(trimOrNull(assetRequest.getDescription()))
                 .imageUrl(trimOrNull(assetRequest.getImageUrl()))
                 .category(category)
                 .build());
 
-        AssetCopyRequest assetCopyRequest = AssetCopyRequest.builder()
+        AssetCopy copy = AssetCopy.builder()
+                .asset(savedAsset)
                 .state(AssetCopyState.NEW)
                 .build();
 
-        // Create copy for the new asset
-        AssetCopyDTO createdCopy = assetCopyService.createAssetCopy(savedAsset.getId(), assetCopyRequest);
-        log.info("Asset copy has been created: {}", createdCopy);
+        AssetCopy savedCopy = assetCopyRepository.save(copy);
 
-        return mapper.toDto(savedAsset);
+        savedAsset.addCopy(savedCopy);
+
+        return assetMapper.toDto(savedAsset);
     }
 
     public List<AssetDTO> findAllAssets() {
         List<Asset> assets = assetRepository.findAll();
         return assets.stream()
-                .map(mapper::toDto)
+                .map(assetMapper::toDto)
                 .toList();
     }
 
@@ -60,7 +64,7 @@ public class AssetService {
         Asset asset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
-        return mapper.toDto(asset);
+        return assetMapper.toDto(asset);
     }
 
     // TODO : Check auth + role
@@ -74,16 +78,16 @@ public class AssetService {
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequest.getCategoryId()));
 
         // Update existing asset with new data
-        existingAsset.setTitle(assetRequest.getTitle());
-        existingAsset.setDescription(assetRequest.getDescription());
-        existingAsset.setImageUrl(assetRequest.getImageUrl());
+        existingAsset.setTitle(trimOrNull(assetRequest.getTitle()));
+        existingAsset.setDescription(trimOrNull(assetRequest.getDescription()));
+        existingAsset.setImageUrl(trimOrNull(assetRequest.getImageUrl()));
         existingAsset.setCategory(existingCategory);
 
         // Save changes in base
         Asset updatedAsset = assetRepository.save(existingAsset);
 
         // Map entity to DTO and return DTO to controller, which then returns it to client
-        return mapper.toDto(updatedAsset);
+        return assetMapper.toDto(updatedAsset);
     }
 
     // TODO : Check auth + role
