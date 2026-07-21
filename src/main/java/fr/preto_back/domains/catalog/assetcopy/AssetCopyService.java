@@ -31,7 +31,7 @@ public class AssetCopyService {
         return mapper.toDto(assetCopy);
     }
 
-    public List<AssetCopyDTO> findAllAssetCopiesByAssetId(Integer assetId) {
+    public List<AssetCopyDTO> findCopiesByAssetId(Integer assetId) {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
