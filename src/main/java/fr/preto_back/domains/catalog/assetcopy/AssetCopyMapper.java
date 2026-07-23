@@ -6,16 +6,14 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class AssetCopyMapper {
-    // Maps entity to dto and add isAvailable
-    public AssetCopyDTO toDto(
-            AssetCopy assetCopy
-            // boolean isAvailable
-    ) {
+    private final AssetCopyHelper assetCopyHelper;
+    // Maps entity to dto and calculate isAvailable depending on copy physical state
+    public AssetCopyDTO toDto(AssetCopy assetCopy) {
         return AssetCopyDTO.builder()
                 .id(assetCopy.getId())
                 .assetId(assetCopy.getAsset().getId())
                 .state(assetCopy.getState())
-                // .isAvailable(isAvailable)
+                .isAvailable(assetCopyHelper.checkCopyAvailableState(assetCopy))
                 .build();
     }
 }

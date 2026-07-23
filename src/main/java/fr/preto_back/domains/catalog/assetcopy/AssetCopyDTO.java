@@ -19,6 +19,5 @@ public class AssetCopyDTO {
     Integer id;
     Integer assetId;
     AssetCopyState state;
-    // TODO : uncomment isAvailable when resa/loan ready
-    // boolean isAvailable;
+    boolean isAvailable;
 }

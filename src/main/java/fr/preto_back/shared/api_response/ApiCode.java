@@ -25,6 +25,7 @@ public enum ApiCode {
     ASSET_COPY_SAVE_SUCCESS("Asset copy created successfully"),
     ASSET_COPY_FOUND_SUCCESS("Asset copy found"),
     ASSET_COPIES_FOUND_SUCCESS("Asset copies found"),
+    ASSET_COPY_NO_AVAILABLE_COPY("No available copy was found"),
 
     // Category
     CATEGORY_NOT_FOUND("Category not found");
