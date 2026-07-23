@@ -17,7 +17,7 @@ public class TestAssetService {
     @Test
     public void testCreateAsset_OK() {
         // Instantiate valid assetRequest
-        AssetRequest assetRequest = AssetRequest.builder()
+        AssetRequestBody assetRequestBody = AssetRequestBody.builder()
                 .title("Ordinateur portable")
                 .description("15 pouces")
                 .imageUrl(null)
@@ -25,7 +25,7 @@ public class TestAssetService {
                 .build();
 
         // Create AssetDTO using createAsset method from service
-        AssetDTO createdAsset = assetService.createAsset(assetRequest);
+        AssetDTO createdAsset = assetService.createAsset(assetRequestBody);
         log.info("Asset has been created: {}", createdAsset);
 
         // Test that the AssetDTO has been created with testing its id
@@ -38,7 +38,7 @@ public class TestAssetService {
     @Test
     public void testCreateAsset_KO_CategoryDoesNotExist() {
         // Instantiate invalid assetRequest -> with category id that does not exist
-        AssetRequest assetRequest = AssetRequest.builder()
+        AssetRequestBody assetRequestBody = AssetRequestBody.builder()
                 .title("Ordinateur portable")
                 .description("15 pouces")
                 .imageUrl(null)
@@ -46,7 +46,7 @@ public class TestAssetService {
                 .build();
 
         // Test that createAsset method from service throws a vResourceNotFoundException
-        Assertions.assertThatThrownBy(() -> assetService.createAsset(assetRequest))
+        Assertions.assertThatThrownBy(() -> assetService.createAsset(assetRequestBody))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining(ApiCode.CATEGORY_NOT_FOUND.getMessage());
     }

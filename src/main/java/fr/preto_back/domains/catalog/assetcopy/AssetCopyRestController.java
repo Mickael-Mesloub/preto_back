@@ -26,9 +26,9 @@ public class AssetCopyRestController {
     @PostMapping("/{assetId}/new-copy")
     public ResponseEntity<ApiResponse<AssetCopyDTO>> createAssetCopy(
             @PathVariable String assetId,
-            @Valid @RequestBody AssetCopyRequest assetCopyRequest
+            @Valid @RequestBody AssetCopyRequestBody assetCopyRequestBody
     ) {
-        AssetCopyDTO createdAssetCopy = assetCopyService.createAssetCopy(Integer.parseInt(assetId.trim()), assetCopyRequest);
+        AssetCopyDTO createdAssetCopy = assetCopyService.createAssetCopy(Integer.parseInt(assetId.trim()), assetCopyRequestBody);
         ApiResponse<AssetCopyDTO> response = ApiResponse.success(ApiCode.ASSET_COPY_SAVE_SUCCESS.name(), ApiCode.ASSET_COPY_SAVE_SUCCESS.getMessage(), createdAssetCopy);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

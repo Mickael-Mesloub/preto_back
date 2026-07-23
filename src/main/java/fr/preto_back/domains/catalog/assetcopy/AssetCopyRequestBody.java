@@ -15,7 +15,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class AssetCopyRequest {
+public class AssetCopyRequestBody {
     AssetCopyState state;
     // TODO : uncomment isAvailable when resa/loan ready
     // boolean isAvailable;

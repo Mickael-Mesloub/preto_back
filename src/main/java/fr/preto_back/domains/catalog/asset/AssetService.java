@@ -29,15 +29,15 @@ public class AssetService {
     private final AssetCopyMapper assetCopyMapper;
 
     // TODO : Check auth + role
-    public AssetDTO createAsset(AssetRequest assetRequest) {
+    public AssetDTO createAsset(AssetRequestBody assetRequestBody) {
 
-        Category category = categoryRepository.findById(assetRequest.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequest.getCategoryId()));
+        Category category = categoryRepository.findById(assetRequestBody.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequestBody.getCategoryId()));
 
         Asset savedAsset = assetRepository.save(Asset.builder()
-                .title(trimOrNull(assetRequest.getTitle()))
-                .description(trimOrNull(assetRequest.getDescription()))
-                .imageUrl(trimOrNull(assetRequest.getImageUrl()))
+                .title(trimOrNull(assetRequestBody.getTitle()))
+                .description(trimOrNull(assetRequestBody.getDescription()))
+                .imageUrl(trimOrNull(assetRequestBody.getImageUrl()))
                 .category(category)
                 .build());
 
@@ -68,19 +68,19 @@ public class AssetService {
     }
 
     // TODO : Check auth + role
-    public AssetDTO updateAsset(int assetId, AssetRequest assetRequest) {
+    public AssetDTO updateAsset(int assetId, AssetRequestBody assetRequestBody) {
         // Check if asset with assetid provided exists. If not, throw custom Not found exception
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
         // Check if category provided exists. If not, throw custom Not found exception
-        Category existingCategory = categoryRepository.findById(assetRequest.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequest.getCategoryId()));
+        Category existingCategory = categoryRepository.findById(assetRequestBody.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequestBody.getCategoryId()));
 
         // Update existing asset with new data
-        existingAsset.setTitle(trimOrNull(assetRequest.getTitle()));
-        existingAsset.setDescription(trimOrNull(assetRequest.getDescription()));
-        existingAsset.setImageUrl(trimOrNull(assetRequest.getImageUrl()));
+        existingAsset.setTitle(trimOrNull(assetRequestBody.getTitle()));
+        existingAsset.setDescription(trimOrNull(assetRequestBody.getDescription()));
+        existingAsset.setImageUrl(trimOrNull(assetRequestBody.getImageUrl()));
         existingAsset.setCategory(existingCategory);
 
         // Save changes in base

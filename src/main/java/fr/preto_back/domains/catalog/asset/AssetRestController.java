@@ -29,8 +29,8 @@ public class AssetRestController {
     // TODO : Replace return type Asset by AssetDTO and use AssetMapper toDto() method for mapping
 
     @PostMapping("/new")
-    public ResponseEntity<ApiResponse<AssetDTO>> createAsset(@Valid @RequestBody AssetRequest assetRequest) {
-        AssetDTO createdAsset = assetService.createAsset(assetRequest);
+    public ResponseEntity<ApiResponse<AssetDTO>> createAsset(@Valid @RequestBody AssetRequestBody assetRequestBody) {
+        AssetDTO createdAsset = assetService.createAsset(assetRequestBody);
         ApiResponse<AssetDTO> response = ApiResponse.success(ApiCode.ASSET_SAVE_SUCCESS.name(), ApiCode.ASSET_SAVE_SUCCESS.getMessage(), createdAsset);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -54,8 +54,8 @@ public class AssetRestController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<ApiResponse<AssetDTO>> updateAsset(@PathVariable String id, @Valid @RequestBody AssetRequest aassetRequest) {
-        AssetDTO updatedAsset = assetService.updateAsset(Integer.parseInt(id.trim()), aassetRequest);
+    public ResponseEntity<ApiResponse<AssetDTO>> updateAsset(@PathVariable String id, @Valid @RequestBody AssetRequestBody aassetRequestBody) {
+        AssetDTO updatedAsset = assetService.updateAsset(Integer.parseInt(id.trim()), aassetRequestBody);
         ApiResponse<AssetDTO> response = ApiResponse.success(ApiCode.ASSET_UPDATE_SUCCESS.name(), ApiCode.ASSET_UPDATE_SUCCESS.getMessage(), updatedAsset);
 
         return ResponseEntity.ok(response);

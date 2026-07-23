@@ -42,13 +42,13 @@ public class AssetCopyService {
                 .toList();
     }
 
-    public AssetCopyDTO createAssetCopy(Integer assetId, AssetCopyRequest assetCopyRequest) {
+    public AssetCopyDTO createAssetCopy(Integer assetId, AssetCopyRequestBody assetCopyRequestBody) {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
         AssetCopy newAssetCopy = assetCopyRepository.save(AssetCopy.builder()
                 .asset(existingAsset)
-                .state(assetCopyRequest.getState())
+                .state(assetCopyRequestBody.getState())
                 .build());
 
         return mapper.toDto(newAssetCopy);

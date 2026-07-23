@@ -18,7 +18,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class AssetRequest {
+public class AssetRequestBody {
     @NotBlank(message = "{VALIDATION_ASSET_TITLE_REQUIRED}")
     @Size(min = 3, max = 60, message = "{VALIDATION_ASSET_TITLE_SIZE}")
     String title;
