@@ -28,7 +28,14 @@ public enum ApiCode {
     ASSET_COPY_NO_AVAILABLE_COPY("No available copy was found"),
 
     // Category
-    CATEGORY_NOT_FOUND("Category not found");
+    CATEGORY_NOT_FOUND("Category not found"),
+
+    // Reservation Request
+    RESA_SAVE_SUCCESS("New reservation request sent successfully"),
+
+    // User
+    USER_NOT_FOUND("User not found");
+
 
     private final String message;
 
