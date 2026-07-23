@@ -7,11 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -29,5 +32,13 @@ public class ReservationRequestRestController {
         ApiResponse<ReservationRequestDTO> response = ApiResponse.success(ApiCode.RESA_SAVE_SUCCESS.name(), ApiCode.RESA_SAVE_SUCCESS.getMessage(), reservationRequestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ReservationRequestDTO>>> getAllReservationRequests() {
+        List<ReservationRequestDTO> reservationRequestDtos = reservationRequestService.findAllReservationRequests();
+        ApiResponse<List<ReservationRequestDTO>> response = ApiResponse.success(ApiCode.RESAS_FOUND_SUCCESS.name(), ApiCode.RESAS_FOUND_SUCCESS.getMessage(), reservationRequestDtos);
+
+        return ResponseEntity.ok(response);
     }
 }

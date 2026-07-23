@@ -68,4 +68,23 @@ public class ReservationRequestService {
         return mapper.toDto(reservationRequest);
     }
 
+    // TODO : check auth user role == MANAGER || ADMIN
+    public List<ReservationRequestDTO> findAllReservationRequests() {
+        List<ReservationRequest> reservationRequests = reservationRequestRepository.findAll();
+
+        return reservationRequests.stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
+    // TODO : check auth user role == MANAGER || ADMIN
+    public List<ReservationRequestDTO> findReservationRequestsByStatus(ReservationRequestStatus status) {
+        List<ReservationRequest> reservationRequests = reservationRequestRepository.findReservationRequestByStatusIs(status);
+
+        return reservationRequests.stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
+
 }

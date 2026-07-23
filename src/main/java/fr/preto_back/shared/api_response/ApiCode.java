@@ -32,7 +32,7 @@ public enum ApiCode {
 
     // Reservation Request
     RESA_SAVE_SUCCESS("New reservation request sent successfully"),
-
+    RESAS_FOUND_SUCCESS("Reservation requests found"),
     // User
     USER_NOT_FOUND("User not found");
 
