@@ -60,4 +60,7 @@ public class ReservationRequest {
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)
     private @Builder.Default ReservationRequestStatus status = ReservationRequestStatus.PENDING;
+
+    @Column(name = "DECLINE_REASON")
+    private String declineReason;
 }

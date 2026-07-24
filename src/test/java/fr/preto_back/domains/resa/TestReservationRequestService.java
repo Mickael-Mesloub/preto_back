@@ -1,5 +1,7 @@
 package fr.preto_back.domains.resa;
 
+import fr.preto_back.shared.api_response.ApiCode;
+import fr.preto_back.shared.exception.DeclineReasonMissingException;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,5 +53,39 @@ public class TestReservationRequestService {
 
         // The list should not be empty
         Assertions.assertThat(pendingRequests).isNotEmpty();
+    }
+
+    @Test
+    public void testProcessReservationRequest_OK() {
+        Integer managerId = 2;
+
+        // TODO : create new resa
+        Integer resaId = 1;
+
+        ProcessReservationRequestBody body = ProcessReservationRequestBody.builder()
+                .decision(ReservationRequestDecision.APPROVED)
+                .declineReason(null)
+                .build();
+
+        ReservationRequestDTO dto = reservationRequestService.processReservationRequest(managerId, resaId, body);
+
+        Assertions.assertThat(dto).isNotNull();
+        Assertions.assertThat(dto.managerId).isEqualTo(managerId);
+        Assertions.assertThat(dto.status).isEqualTo(ReservationRequestStatus.APPROVED);
+    }
+
+    @Test
+    public void testProcessReservationRequest_KO_Missing_Decline_Reason() {
+        Integer managerId = 2;
+        Integer resaId = 1;
+
+        ProcessReservationRequestBody body = ProcessReservationRequestBody.builder()
+                .decision(ReservationRequestDecision.DECLINED)
+                .declineReason(null)
+                .build();
+
+        Assertions.assertThatThrownBy(() -> reservationRequestService.processReservationRequest(managerId, resaId, body))
+                .isInstanceOf(DeclineReasonMissingException.class)
+                .hasMessageContaining(ApiCode.RESA_DECLINE_MISSING_REASON.getMessage());
     }
 }

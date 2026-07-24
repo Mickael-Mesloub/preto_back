@@ -8,8 +8,12 @@ import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
 import fr.preto_back.domains.user.User;
 import fr.preto_back.domains.user.UserRepository;
 import fr.preto_back.shared.api_response.ApiCode;
+import fr.preto_back.shared.exception.DeclineReasonMissingException;
+import fr.preto_back.shared.exception.InvalidDecisionException;
 import fr.preto_back.shared.exception.NoAvailableCopyException;
+import fr.preto_back.shared.exception.NotPendingReservationRequestException;
 import fr.preto_back.shared.exception.ResourceNotFoundException;
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -65,7 +69,7 @@ public class ReservationRequestService {
                 .build());
 
         // Map entity to dto and send dto to controller
-        return mapper.toDto(reservationRequest);
+        return mapper.toDto(reservationRequest, ReservationRequestStatus.PENDING, null);
     }
 
     // TODO : check auth user role == MANAGER || ADMIN
@@ -86,5 +90,56 @@ public class ReservationRequestService {
                 .toList();
     }
 
+    // Process reservation request
+    public ReservationRequestDTO processReservationRequest(Integer managerId, Integer resaId, ProcessReservationRequestBody body) {
+        log.info("processReservationRequest, managerId={}, resaId={}, body={}", managerId, resaId, body);
+
+        // Retrieve user with managerId => if not found, exception
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + managerId));
+
+        // TODO: check role == MANAGER
+
+        // Retrieve reservationRequest with resaId => if not found, exception
+        ReservationRequest reservationRequest = reservationRequestRepository.findById(resaId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + resaId));
+
+        // Retrieve requester with requesterId from existingReservationRequest
+        User requester = userRepository.findById(reservationRequest.getRequester().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + reservationRequest.getRequester().getId()));
+
+        // Check status == PENDING => if not, exception
+        boolean isPending = reservationRequest.getStatus().equals(ReservationRequestStatus.PENDING);
+
+        if(!isPending) {
+            throw new NotPendingReservationRequestException();
+        }
+
+        // Check if decision is either APPROVED or DECLINED => if not, exception
+        if (body.getDecision() != ReservationRequestDecision.APPROVED && body.getDecision() != ReservationRequestDecision.DECLINED) {
+            throw new InvalidDecisionException();
+        }
+
+        // Check if decision == DECLINED
+            // If so, check that declineReason not null/blank. => If so, exception
+        if (body.getDecision() == ReservationRequestDecision.DECLINED
+                && StringUtils.isBlank(body.getDeclineReason())) {
+            throw new DeclineReasonMissingException();
+        }
+
+        // Update reservationRequest with manager, status APPROVED or DECLINED, declineReason
+        reservationRequest.setStatus(body.getDecision().toStatus());
+        reservationRequest.setManager(manager);
+        reservationRequest.setDeclineReason(body.getDeclineReason());
+
+
+        // TODO : If APPROVED, create LoanDTO
+
+        // Save ReservationRequest in base
+        ReservationRequest updatedResa = reservationRequestRepository.save(reservationRequest);
+
+        // Return updated DTO
+        return mapper.toDto(updatedResa, updatedResa.getStatus(), updatedResa.getDeclineReason());
+    }
 
 }
