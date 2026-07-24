@@ -35,8 +35,9 @@ public enum ApiCode {
     RESAS_FOUND_SUCCESS("Reservation requests found"),
     RESA_NOT_FOUND("Reservation request not found"),
     RESA_NOT_PENDING("Only PENDING reservation requests can be processed"),
-    RESA_DECLINE_MISSING_REASON("A reason must be provided if declining a reservation request"),
+    RESA_DECLINED_MISSING_REASON("A reason must be provided if declining a reservation request"),
     RESA_INVALID_DECISION("Decision must be either APPROVED or DECLINED"),
+    RESA_PROCESS_SUCCESS("Reservation request processed successfully"),
 
     // User
     USER_NOT_FOUND("User not found");

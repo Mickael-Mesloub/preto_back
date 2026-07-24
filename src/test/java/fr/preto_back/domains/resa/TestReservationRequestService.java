@@ -77,6 +77,8 @@ public class TestReservationRequestService {
     @Test
     public void testProcessReservationRequest_KO_Missing_Decline_Reason() {
         Integer managerId = 2;
+
+        // TODO : create new resa
         Integer resaId = 1;
 
         ProcessReservationRequestBody body = ProcessReservationRequestBody.builder()
@@ -86,6 +88,6 @@ public class TestReservationRequestService {
 
         Assertions.assertThatThrownBy(() -> reservationRequestService.processReservationRequest(managerId, resaId, body))
                 .isInstanceOf(DeclineReasonMissingException.class)
-                .hasMessageContaining(ApiCode.RESA_DECLINE_MISSING_REASON.getMessage());
+                .hasMessageContaining(ApiCode.RESA_DECLINED_MISSING_REASON.getMessage());
     }
 }

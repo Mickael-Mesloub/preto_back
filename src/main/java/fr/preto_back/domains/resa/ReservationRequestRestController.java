@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +25,12 @@ import java.util.List;
 public class ReservationRequestRestController {
     private ReservationRequestService reservationRequestService;
 
+    // TODO: maybe change route, as it might be confusing with assetId
     @PostMapping("/{assetId}/new")
     public ResponseEntity<ApiResponse<ReservationRequestDTO>> newReservationRequest(@PathVariable String assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
         // TODO: replace with auth userId
         Integer userId = 3;
+
         ReservationRequestDTO reservationRequestDto = reservationRequestService.newReservationRequest(userId, Integer.parseInt(assetId.trim()), reservationRequestBody);
         ApiResponse<ReservationRequestDTO> response = ApiResponse.success(ApiCode.RESA_SAVE_SUCCESS.name(), ApiCode.RESA_SAVE_SUCCESS.getMessage(), reservationRequestDto);
 
@@ -40,5 +43,17 @@ public class ReservationRequestRestController {
         ApiResponse<List<ReservationRequestDTO>> response = ApiResponse.success(ApiCode.RESAS_FOUND_SUCCESS.name(), ApiCode.RESAS_FOUND_SUCCESS.getMessage(), reservationRequestDtos);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/process")
+    public ResponseEntity<ApiResponse<ReservationRequestDTO>> processReservationRequest(@PathVariable String id, @RequestBody ProcessReservationRequestBody body) {
+        // TODO: replace with auth userId
+        Integer managerId = 2;
+
+        ReservationRequestDTO reservationRequestDTO = reservationRequestService.processReservationRequest(managerId, Integer.parseInt(id.trim()), body);
+        ApiResponse<ReservationRequestDTO> response = ApiResponse.success(ApiCode.RESA_PROCESS_SUCCESS.name(), ApiCode.RESA_PROCESS_SUCCESS.getMessage(), reservationRequestDTO);
+
+        return ResponseEntity.ok(response);
+
     }
 }
