@@ -25,46 +25,43 @@ import java.util.List;
 public class AssetRestController {
     private final AssetService assetService;
 
-    // TODO : Replace AssetDTO by AssetRequest
-    // TODO : Replace return type Asset by AssetDTO and use AssetMapper toDto() method for mapping
-
     @PostMapping("/new")
-    public ResponseEntity<ApiResponse<AssetDTO>> createAsset(@Valid @RequestBody AssetRequestBody assetRequestBody) {
-        AssetDTO createdAsset = assetService.createAsset(assetRequestBody);
-        ApiResponse<AssetDTO> response = ApiResponse.success(ApiCode.ASSET_SAVE_SUCCESS.name(), ApiCode.ASSET_SAVE_SUCCESS.getMessage(), createdAsset);
+    public ResponseEntity<ApiResponse<AssetResponseBody>> createAsset(@Valid @RequestBody AssetRequestBody assetRequestBody) {
+        AssetResponseBody createdAsset = assetService.createAsset(assetRequestBody);
+        ApiResponse<AssetResponseBody> response = ApiResponse.success(ApiCode.ASSET_SAVE_SUCCESS.name(), ApiCode.ASSET_SAVE_SUCCESS.getMessage(), createdAsset);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<AssetDTO>>> getAllAssets() {
-        List<AssetDTO> assets = assetService.findAllAssets();
+    public ResponseEntity<ApiResponse<List<AssetResponseBody>>> getAllAssets() {
+        List<AssetResponseBody> assets = assetService.findAllAssets();
 
-        ApiResponse<List<AssetDTO>> response = ApiResponse.success(ApiCode.ASSETS_FOUND_SUCCESS.name(), ApiCode.ASSETS_FOUND_SUCCESS.getMessage(), assets);
+        ApiResponse<List<AssetResponseBody>> response = ApiResponse.success(ApiCode.ASSETS_FOUND_SUCCESS.name(), ApiCode.ASSETS_FOUND_SUCCESS.getMessage(), assets);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<AssetDTO>> getAssetById(@PathVariable String id) {
-        AssetDTO asset = assetService.findAssetById(Integer.parseInt(id.trim()));
-        ApiResponse<AssetDTO> response = ApiResponse.success(ApiCode.ASSET_FOUND_SUCCESS.name(),  ApiCode.ASSET_FOUND_SUCCESS.getMessage(), asset);
+    public ResponseEntity<ApiResponse<AssetResponseBody>> getAssetById(@PathVariable String id) {
+        AssetResponseBody asset = assetService.findAssetById(Integer.parseInt(id.trim()));
+        ApiResponse<AssetResponseBody> response = ApiResponse.success(ApiCode.ASSET_FOUND_SUCCESS.name(),  ApiCode.ASSET_FOUND_SUCCESS.getMessage(), asset);
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<ApiResponse<AssetDTO>> updateAsset(@PathVariable String id, @Valid @RequestBody AssetRequestBody aassetRequestBody) {
-        AssetDTO updatedAsset = assetService.updateAsset(Integer.parseInt(id.trim()), aassetRequestBody);
-        ApiResponse<AssetDTO> response = ApiResponse.success(ApiCode.ASSET_UPDATE_SUCCESS.name(), ApiCode.ASSET_UPDATE_SUCCESS.getMessage(), updatedAsset);
+    public ResponseEntity<ApiResponse<AssetResponseBody>> updateAsset(@PathVariable String id, @Valid @RequestBody AssetRequestBody aassetRequestBody) {
+        AssetResponseBody updatedAsset = assetService.updateAsset(Integer.parseInt(id.trim()), aassetRequestBody);
+        ApiResponse<AssetResponseBody> response = ApiResponse.success(ApiCode.ASSET_UPDATE_SUCCESS.name(), ApiCode.ASSET_UPDATE_SUCCESS.getMessage(), updatedAsset);
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<ApiResponse<AssetDTO>> deleteAsset(@PathVariable String id) {
-        assetService.deleteAsset(Integer.parseInt(id.trim()));
-        ApiResponse<AssetDTO> response = ApiResponse.success(ApiCode.ASSET_DELETE_SUCCESS.name(), ApiCode.ASSET_DELETE_SUCCESS.getMessage(), null);
+    public ResponseEntity<ApiResponse<AssetResponseBody>> deleteAsset(@PathVariable String id) {
+        assetService.deleteAssetById(Integer.parseInt(id.trim()));
+        ApiResponse<AssetResponseBody> response = ApiResponse.success(ApiCode.ASSET_DELETE_SUCCESS.name(), ApiCode.ASSET_DELETE_SUCCESS.getMessage(), null);
 
         return ResponseEntity.ok(response);
     }

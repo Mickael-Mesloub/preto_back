@@ -24,11 +24,11 @@ public class TestAssetService {
                 .categoryId(1)
                 .build();
 
-        // Create AssetDTO using createAsset method from service
-        AssetDTO createdAsset = assetService.createAsset(assetRequestBody);
+        // Create AssetResponseBody using createAsset method from service
+        AssetResponseBody createdAsset = assetService.createAsset(assetRequestBody);
         log.info("Asset has been created: {}", createdAsset);
 
-        // Test that the AssetDTO has been created with testing its id
+        // Test that the AssetResponseBody has been created with testing its id
         Assertions.assertThat(createdAsset.getId()).isNotNull();
 
         // Test that a copy has been created for this asset

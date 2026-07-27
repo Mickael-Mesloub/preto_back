@@ -24,36 +24,36 @@ public class AssetCopyRestController {
     private final AssetCopyService assetCopyService;
 
     @PostMapping("/{assetId}/new-copy")
-    public ResponseEntity<ApiResponse<AssetCopyDTO>> createAssetCopy(
+    public ResponseEntity<ApiResponse<AssetCopyResponseBody>> createAssetCopy(
             @PathVariable String assetId,
             @Valid @RequestBody AssetCopyRequestBody assetCopyRequestBody
     ) {
-        AssetCopyDTO createdAssetCopy = assetCopyService.createAssetCopy(Integer.parseInt(assetId.trim()), assetCopyRequestBody);
-        ApiResponse<AssetCopyDTO> response = ApiResponse.success(ApiCode.ASSET_COPY_SAVE_SUCCESS.name(), ApiCode.ASSET_COPY_SAVE_SUCCESS.getMessage(), createdAssetCopy);
+        AssetCopyResponseBody createdAssetCopy = assetCopyService.createAssetCopy(Integer.parseInt(assetId.trim()), assetCopyRequestBody);
+        ApiResponse<AssetCopyResponseBody> response = ApiResponse.success(ApiCode.ASSET_COPY_SAVE_SUCCESS.name(), ApiCode.ASSET_COPY_SAVE_SUCCESS.getMessage(), createdAssetCopy);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/copies/{id}")
-    public ResponseEntity<ApiResponse<AssetCopyDTO>> getAssetCopyById(@PathVariable String id) {
-        AssetCopyDTO assetCopy = assetCopyService.findById(Integer.parseInt(id.trim()));
-        ApiResponse<AssetCopyDTO> response = ApiResponse.success(ApiCode.ASSET_COPY_FOUND_SUCCESS.name(), ApiCode.ASSET_COPY_FOUND_SUCCESS.getMessage(), assetCopy);
+    public ResponseEntity<ApiResponse<AssetCopyResponseBody>> getAssetCopyById(@PathVariable String id) {
+        AssetCopyResponseBody assetCopy = assetCopyService.findById(Integer.parseInt(id.trim()));
+        ApiResponse<AssetCopyResponseBody> response = ApiResponse.success(ApiCode.ASSET_COPY_FOUND_SUCCESS.name(), ApiCode.ASSET_COPY_FOUND_SUCCESS.getMessage(), assetCopy);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/copies/all")
-    public ResponseEntity<ApiResponse<List<AssetCopyDTO>>> getAllAssetCopies() {
-        List<AssetCopyDTO> assetCopies = assetCopyService.findAllAssetCopies();
-        ApiResponse<List<AssetCopyDTO>> response = ApiResponse.success(ApiCode.ASSET_COPIES_FOUND_SUCCESS.name(), ApiCode.ASSET_COPIES_FOUND_SUCCESS.getMessage(), assetCopies);
+    public ResponseEntity<ApiResponse<List<AssetCopyResponseBody>>> getAllAssetCopies() {
+        List<AssetCopyResponseBody> assetCopies = assetCopyService.findAllAssetCopies();
+        ApiResponse<List<AssetCopyResponseBody>> response = ApiResponse.success(ApiCode.ASSET_COPIES_FOUND_SUCCESS.name(), ApiCode.ASSET_COPIES_FOUND_SUCCESS.getMessage(), assetCopies);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{assetId}/copies")
-    public ResponseEntity<ApiResponse<List<AssetCopyDTO>>> getCopiesByAssetId(@PathVariable String assetId) {
-        List<AssetCopyDTO> assetCopies = assetCopyService.findCopiesByAssetId(Integer.parseInt(assetId.trim()));
-        ApiResponse<List<AssetCopyDTO>> response = ApiResponse.success(ApiCode.ASSET_COPIES_FOUND_SUCCESS.name(), ApiCode.ASSET_COPIES_FOUND_SUCCESS.getMessage(), assetCopies);
+    public ResponseEntity<ApiResponse<List<AssetCopyResponseBody>>> getCopiesByAssetId(@PathVariable String assetId) {
+        List<AssetCopyResponseBody> assetCopies = assetCopyService.findCopiesByAssetId(Integer.parseInt(assetId.trim()));
+        ApiResponse<List<AssetCopyResponseBody>> response = ApiResponse.success(ApiCode.ASSET_COPIES_FOUND_SUCCESS.name(), ApiCode.ASSET_COPIES_FOUND_SUCCESS.getMessage(), assetCopies);
 
         return ResponseEntity.ok(response);
     }

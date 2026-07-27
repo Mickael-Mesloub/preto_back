@@ -15,7 +15,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class AssetCopyDTO {
+public class AssetCopyResponseBody {
     Integer id;
     Integer assetId;
     AssetCopyState state;

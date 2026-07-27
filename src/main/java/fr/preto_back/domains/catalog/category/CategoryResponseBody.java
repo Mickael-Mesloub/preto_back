@@ -15,7 +15,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class CategoryDTO {
+public class CategoryResponseBody {
     private Integer id;
     private String name;
 }

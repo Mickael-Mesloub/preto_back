@@ -29,7 +29,7 @@ public class AssetService {
     private final AssetCopyMapper assetCopyMapper;
 
     // TODO : Check auth + role
-    public AssetDTO createAsset(AssetRequestBody assetRequestBody) {
+    public AssetResponseBody createAsset(AssetRequestBody assetRequestBody) {
 
         Category category = categoryRepository.findById(assetRequestBody.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.CATEGORY_NOT_FOUND, ApiCode.CATEGORY_NOT_FOUND.getMessage() + " with id " + assetRequestBody.getCategoryId()));
@@ -53,14 +53,14 @@ public class AssetService {
         return assetMapper.toDto(savedAsset);
     }
 
-    public List<AssetDTO> findAllAssets() {
+    public List<AssetResponseBody> findAllAssets() {
         List<Asset> assets = assetRepository.findAll();
         return assets.stream()
                 .map(assetMapper::toDto)
                 .toList();
     }
 
-    public AssetDTO findAssetById(int assetId) {
+    public AssetResponseBody findAssetById(int assetId) {
         Asset asset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
@@ -68,7 +68,7 @@ public class AssetService {
     }
 
     // TODO : Check auth + role
-    public AssetDTO updateAsset(int assetId, AssetRequestBody assetRequestBody) {
+    public AssetResponseBody updateAsset(int assetId, AssetRequestBody assetRequestBody) {
         // Check if asset with assetid provided exists. If not, throw custom Not found exception
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
@@ -91,7 +91,7 @@ public class AssetService {
     }
 
     // TODO : Check auth + role
-    public void deleteAsset(int assetId) {
+    public void deleteAssetById(int assetId) {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 

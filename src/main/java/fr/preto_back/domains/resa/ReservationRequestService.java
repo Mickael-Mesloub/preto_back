@@ -33,7 +33,7 @@ public class ReservationRequestService {
     private final ReservationRequestMapper mapper;
     private final AssetCopyRepository assetCopyRepository;
 
-    public ReservationRequestDTO newReservationRequest(Integer requesterId, Integer assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
+    public ReservationRequestResponseBody newReservationRequest(Integer requesterId, Integer assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
         log.info("Received new reservation request, assetId={}, reservationRequest={}", assetId,  reservationRequestBody);
 
         // TODO: startDate and returnDate validation -> returnDate cannot be before or equal to startDate
@@ -73,7 +73,7 @@ public class ReservationRequestService {
     }
 
     // TODO : check auth user role == MANAGER || ADMIN
-    public List<ReservationRequestDTO> findAllReservationRequests() {
+    public List<ReservationRequestResponseBody> findAllReservationRequests() {
         List<ReservationRequest> reservationRequests = reservationRequestRepository.findAll();
 
         return reservationRequests.stream()
@@ -82,7 +82,7 @@ public class ReservationRequestService {
     }
 
     // TODO : check auth user role == MANAGER || ADMIN
-    public List<ReservationRequestDTO> findReservationRequestsByStatus(ReservationRequestStatus status) {
+    public List<ReservationRequestResponseBody> findReservationRequestsByStatus(ReservationRequestStatus status) {
         List<ReservationRequest> reservationRequests = reservationRequestRepository.findReservationRequestByStatusIs(status);
 
         return reservationRequests.stream()
@@ -91,7 +91,7 @@ public class ReservationRequestService {
     }
 
     // Process reservation request
-    public ReservationRequestDTO processReservationRequest(Integer managerId, Integer resaId, ProcessReservationRequestBody body) {
+    public ReservationRequestResponseBody processReservationRequest(Integer managerId, Integer resaId, ProcessReservationRequestBody body) {
         log.info("processReservationRequest, managerId={}, resaId={}, body={}", managerId, resaId, body);
 
         // Retrieve user with managerId => if not found, exception

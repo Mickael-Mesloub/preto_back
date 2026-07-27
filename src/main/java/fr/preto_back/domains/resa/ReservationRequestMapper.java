@@ -6,19 +6,20 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class ReservationRequestMapper {
-    public ReservationRequestDTO toDto(ReservationRequest reservationRequest) {
-        return ReservationRequestDTO.builder()
+    public ReservationRequestResponseBody toDto(ReservationRequest reservationRequest) {
+        return ReservationRequestResponseBody.builder()
                 .id(reservationRequest.getId())
                 .assetCopyId(reservationRequest.getAssetCopy().getId())
                 .requesterId(reservationRequest.getRequester().getId())
                 .managerId(reservationRequest.getManager() != null ? reservationRequest.getManager().getId() : null)
                 .startDateAsked(reservationRequest.getStartDateAsked())
                 .returnDateAsked(reservationRequest.getReturnDateAsked())
+                .status(ReservationRequestStatus.PENDING)
                 .build();
     }
 
-    public ReservationRequestDTO toDto(ReservationRequest reservationRequest, ReservationRequestStatus status, String declineReason) {
-        return ReservationRequestDTO.builder()
+    public ReservationRequestResponseBody toDto(ReservationRequest reservationRequest, ReservationRequestStatus status, String declineReason) {
+        return ReservationRequestResponseBody.builder()
                 .id(reservationRequest.getId())
                 .assetCopyId(reservationRequest.getAssetCopy().getId())
                 .requesterId(reservationRequest.getRequester().getId())

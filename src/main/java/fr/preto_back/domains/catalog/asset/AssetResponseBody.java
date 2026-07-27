@@ -1,7 +1,7 @@
 package fr.preto_back.domains.catalog.asset;
 
-import fr.preto_back.domains.catalog.assetcopy.AssetCopyDTO;
-import fr.preto_back.domains.catalog.category.CategoryDTO;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyResponseBody;
+import fr.preto_back.domains.catalog.category.CategoryResponseBody;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -19,11 +19,11 @@ import java.util.List;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class AssetDTO {
+public class AssetResponseBody {
     Integer id;
     String title;
     String description;
     String imageUrl;
-    CategoryDTO category;
-    List<AssetCopyDTO> copies;
+    CategoryResponseBody category;
+    List<AssetCopyResponseBody> copies;
 }

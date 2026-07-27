@@ -27,31 +27,31 @@ public class ReservationRequestRestController {
 
     // TODO: maybe change route, as it might be confusing with assetId
     @PostMapping("/{assetId}/new")
-    public ResponseEntity<ApiResponse<ReservationRequestDTO>> newReservationRequest(@PathVariable String assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
+    public ResponseEntity<ApiResponse<ReservationRequestResponseBody>> newReservationRequest(@PathVariable String assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
         // TODO: replace with auth userId
         Integer userId = 3;
 
-        ReservationRequestDTO reservationRequestDto = reservationRequestService.newReservationRequest(userId, Integer.parseInt(assetId.trim()), reservationRequestBody);
-        ApiResponse<ReservationRequestDTO> response = ApiResponse.success(ApiCode.RESA_SAVE_SUCCESS.name(), ApiCode.RESA_SAVE_SUCCESS.getMessage(), reservationRequestDto);
+        ReservationRequestResponseBody reservationRequest = reservationRequestService.newReservationRequest(userId, Integer.parseInt(assetId.trim()), reservationRequestBody);
+        ApiResponse<ReservationRequestResponseBody> response = ApiResponse.success(ApiCode.RESA_SAVE_SUCCESS.name(), ApiCode.RESA_SAVE_SUCCESS.getMessage(), reservationRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<ReservationRequestDTO>>> getAllReservationRequests() {
-        List<ReservationRequestDTO> reservationRequestDtos = reservationRequestService.findAllReservationRequests();
-        ApiResponse<List<ReservationRequestDTO>> response = ApiResponse.success(ApiCode.RESAS_FOUND_SUCCESS.name(), ApiCode.RESAS_FOUND_SUCCESS.getMessage(), reservationRequestDtos);
+    public ResponseEntity<ApiResponse<List<ReservationRequestResponseBody>>> getAllReservationRequests() {
+        List<ReservationRequestResponseBody> reservationRequests = reservationRequestService.findAllReservationRequests();
+        ApiResponse<List<ReservationRequestResponseBody>> response = ApiResponse.success(ApiCode.RESAS_FOUND_SUCCESS.name(), ApiCode.RESAS_FOUND_SUCCESS.getMessage(), reservationRequests);
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}/process")
-    public ResponseEntity<ApiResponse<ReservationRequestDTO>> processReservationRequest(@PathVariable String id, @RequestBody ProcessReservationRequestBody body) {
+    public ResponseEntity<ApiResponse<ReservationRequestResponseBody>> processReservationRequest(@PathVariable String id, @RequestBody ProcessReservationRequestBody body) {
         // TODO: replace with auth userId
         Integer managerId = 2;
 
-        ReservationRequestDTO reservationRequestDTO = reservationRequestService.processReservationRequest(managerId, Integer.parseInt(id.trim()), body);
-        ApiResponse<ReservationRequestDTO> response = ApiResponse.success(ApiCode.RESA_PROCESS_SUCCESS.name(), ApiCode.RESA_PROCESS_SUCCESS.getMessage(), reservationRequestDTO);
+        ReservationRequestResponseBody reservationRequest = reservationRequestService.processReservationRequest(managerId, Integer.parseInt(id.trim()), body);
+        ApiResponse<ReservationRequestResponseBody> response = ApiResponse.success(ApiCode.RESA_PROCESS_SUCCESS.name(), ApiCode.RESA_PROCESS_SUCCESS.getMessage(), reservationRequest);
 
         return ResponseEntity.ok(response);
 

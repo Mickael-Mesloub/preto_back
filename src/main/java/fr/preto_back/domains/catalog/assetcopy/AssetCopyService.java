@@ -16,7 +16,7 @@ public class AssetCopyService {
     private final AssetRepository assetRepository;
     private final AssetCopyMapper mapper;
 
-    public List<AssetCopyDTO> findAllAssetCopies() {
+    public List<AssetCopyResponseBody> findAllAssetCopies() {
         List<AssetCopy> copies = assetCopyRepository.findAll();
 
         return copies.stream()
@@ -24,14 +24,14 @@ public class AssetCopyService {
                 .toList();
     }
 
-    public AssetCopyDTO findById(Integer id) {
+    public AssetCopyResponseBody findById(Integer id) {
         AssetCopy assetCopy = assetCopyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_COPY_NOT_FOUND, ApiCode.ASSET_COPY_NOT_FOUND.getMessage() + " with id " + id));
 
         return mapper.toDto(assetCopy);
     }
 
-    public List<AssetCopyDTO> findCopiesByAssetId(Integer assetId) {
+    public List<AssetCopyResponseBody> findCopiesByAssetId(Integer assetId) {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
@@ -42,7 +42,7 @@ public class AssetCopyService {
                 .toList();
     }
 
-    public AssetCopyDTO createAssetCopy(Integer assetId, AssetCopyRequestBody assetCopyRequestBody) {
+    public AssetCopyResponseBody createAssetCopy(Integer assetId, AssetCopyRequestBody assetCopyRequestBody) {
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 

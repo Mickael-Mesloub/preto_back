@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class ReservationRequestDTO {
+public class ReservationRequestResponseBody {
     Integer id;
     Integer assetCopyId;
     Integer requesterId;
