@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public enum ApiCode {
     // Common
-    TEST("Test response message"),
     INTERNAL_SERVER_ERROR("An unexpected error occurred"),
     VALIDATION_ERROR("Validation failed"),
     INVALID_REQUEST_BODY("Request body is missing or invalid"),
+    ROUTE_NOT_FOUND("Route not found"),
 
     // Asset
     ASSET_NULL("No asset provided"),
