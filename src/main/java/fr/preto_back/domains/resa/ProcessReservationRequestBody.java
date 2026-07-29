@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class ProcessReservationRequestBody {
-    @NotNull(message = "{VALIDATION_RESERVATION_DECISION_REQUIRED}")
+    @NotNull(message = "{VALIDATION_RESA_DECISION_REQUIRED}")
     ReservationRequestDecision decision;
 
     String declineReason;

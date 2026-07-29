@@ -38,7 +38,7 @@ public enum ApiCode {
     RESA_DECLINED_MISSING_REASON("A reason must be provided if declining a reservation request"),
     RESA_INVALID_DECISION("Decision must be either APPROVED or DECLINED"),
     RESA_PROCESS_SUCCESS("Reservation request processed successfully"),
-
+    RESA_RETURN_DATE_BEFORE_OR_EQUALS_START_DATE("Return date cannot be before or equal to start date"),
     // User
     USER_NOT_FOUND("User not found");
 

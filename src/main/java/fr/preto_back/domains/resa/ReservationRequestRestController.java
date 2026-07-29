@@ -2,6 +2,7 @@ package fr.preto_back.domains.resa;
 
 import fr.preto_back.shared.api_response.ApiCode;
 import fr.preto_back.shared.api_response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,8 @@ import java.util.List;
 public class ReservationRequestRestController {
     private ReservationRequestService reservationRequestService;
 
-    // TODO: maybe change route, as it might be confusing with assetId
-    @PostMapping("/{assetId}/new")
-    public ResponseEntity<ApiResponse<ReservationRequestResponseBody>> newReservationRequest(@PathVariable String assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
+    @PostMapping("/asset/{assetId}/new-reservation-request")
+    public ResponseEntity<ApiResponse<ReservationRequestResponseBody>> newReservationRequest(@PathVariable String assetId, @Valid @RequestBody ReservationRequestBody reservationRequestBody) {
         // TODO: replace with auth userId
         Integer userId = 3;
 

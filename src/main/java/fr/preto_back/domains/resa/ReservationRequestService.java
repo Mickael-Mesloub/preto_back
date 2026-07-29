@@ -13,6 +13,7 @@ import fr.preto_back.shared.exception.InvalidDecisionException;
 import fr.preto_back.shared.exception.NoAvailableCopyException;
 import fr.preto_back.shared.exception.NotPendingReservationRequestException;
 import fr.preto_back.shared.exception.ResourceNotFoundException;
+import fr.preto_back.shared.exception.ReturnDateIsBeforeOrEqualsStartDateException;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +37,6 @@ public class ReservationRequestService {
     public ReservationRequestResponseBody newReservationRequest(Integer requesterId, Integer assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
         log.info("Received new reservation request, assetId={}, reservationRequest={}", assetId,  reservationRequestBody);
 
-        // TODO: startDate and returnDate validation -> returnDate cannot be before or equal to startDate
-
         // Check if user exists with requesterId provided
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + requesterId));
@@ -47,6 +46,11 @@ public class ReservationRequestService {
         // Check if asset exists with assetId provided
         Asset existingAsset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
+
+        // Check that return date is not before or equals to start date, as it must be after start date
+        if( reservationRequestBody.returnDate.isBefore(reservationRequestBody.startDate) || reservationRequestBody.returnDate.equals(reservationRequestBody.startDate)) {
+            throw new ReturnDateIsBeforeOrEqualsStartDateException();
+        }
 
         // Retrieve all the existing asset copies
         List<AssetCopy> copies = assetCopyRepository.findAllByAssetId(existingAsset.getId());
