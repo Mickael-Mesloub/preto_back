@@ -50,7 +50,6 @@ public class TestReservationRequestService {
     @Autowired
     private AssetService assetService;
 
-
     // Data that will be setup before tests and cleared after
     private Asset asset;
     private AssetCopy assetCopy;
@@ -93,8 +92,8 @@ public class TestReservationRequestService {
                 .build());
 
         reservationRequestBody = ReservationRequestBody.builder()
-                .startDate(LocalDateTime.of(2026, 8, 1, 12, 5 ))
-                .returnDate(LocalDateTime.of(2026, 8,1, 15, 30 ))
+                .startDate(LocalDateTime.now().plusDays(1))
+                .returnDate(LocalDateTime.now().plusDays(2))
                 .build();
 
         reservationRequest = reservationRequestRepository.save(ReservationRequest.builder()
