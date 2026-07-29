@@ -5,6 +5,8 @@ import fr.preto_back.domains.catalog.asset.AssetRepository;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyHelper;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
+import fr.preto_back.domains.loan.Loan;
+import fr.preto_back.domains.loan.LoanRepository;
 import fr.preto_back.domains.user.User;
 import fr.preto_back.domains.user.UserRepository;
 import fr.preto_back.shared.api_response.ApiCode;
@@ -30,12 +32,13 @@ public class ReservationRequestService {
     private final ReservationRequestRepository reservationRequestRepository;
     private final UserRepository userRepository;
     private final AssetRepository assetRepository;
-    private final AssetCopyHelper  assetCopyHelper;
+    private final AssetCopyHelper assetCopyHelper;
     private final ReservationRequestMapper mapper;
     private final AssetCopyRepository assetCopyRepository;
+    private final LoanRepository loanRepository;
 
     public ReservationRequestResponseBody newReservationRequest(Integer requesterId, Integer assetId, @RequestBody ReservationRequestBody reservationRequestBody) {
-        log.info("Received new reservation request, assetId={}, reservationRequest={}", assetId,  reservationRequestBody);
+        log.info("Received new reservation request, assetId={}, reservationRequest={}", assetId, reservationRequestBody);
 
         // Check if user exists with requesterId provided
         User requester = userRepository.findById(requesterId)
@@ -48,7 +51,7 @@ public class ReservationRequestService {
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
         // Check that return date is not before or equals to start date, as it must be after start date
-        if( reservationRequestBody.returnDate.isBefore(reservationRequestBody.startDate) || reservationRequestBody.returnDate.equals(reservationRequestBody.startDate)) {
+        if (reservationRequestBody.returnDate.isBefore(reservationRequestBody.startDate) || reservationRequestBody.returnDate.equals(reservationRequestBody.startDate)) {
             throw new ReturnDateIsBeforeOrEqualsStartDateException();
         }
 
@@ -115,7 +118,7 @@ public class ReservationRequestService {
         // Check status == PENDING => if not, exception
         boolean isPending = reservationRequest.getStatus().equals(ReservationRequestStatus.PENDING);
 
-        if(!isPending) {
+        if (!isPending) {
             throw new NotPendingReservationRequestException();
         }
 
@@ -125,7 +128,7 @@ public class ReservationRequestService {
         }
 
         // Check if decision == DECLINED
-            // If so, check that declineReason not null/blank. => If so, exception
+        // If so, check that declineReason not null/blank. => If so, exception
         if (body.getDecision() == ReservationRequestDecision.DECLINED
                 && StringUtils.isBlank(body.getDeclineReason())) {
             throw new DeclineReasonMissingException();
@@ -136,11 +139,22 @@ public class ReservationRequestService {
         reservationRequest.setManager(manager);
         reservationRequest.setDeclineReason(body.getDeclineReason());
 
-
-        // TODO : If APPROVED, create LoanDTO
-
         // Save ReservationRequest in base
         ReservationRequest updatedResa = reservationRequestRepository.save(reservationRequest);
+
+        log.info("Resa processed successfully! Details={}", updatedResa);
+
+        // If APPROVED, create Loan
+        if (body.getDecision() == ReservationRequestDecision.APPROVED) {
+            Loan newLoan = loanRepository.save(Loan.builder()
+                    .actualCheckoutDate(null)
+                    .actualReturnDate(null)
+                    .reservationRequest(updatedResa)
+                    .build()
+            );
+
+            log.info("New loan has been created: {}", newLoan);
+        }
 
         // Return updated DTO
         return mapper.toDto(updatedResa, updatedResa.getStatus(), updatedResa.getDeclineReason());
