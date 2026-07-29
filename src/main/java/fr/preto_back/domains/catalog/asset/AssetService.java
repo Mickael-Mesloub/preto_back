@@ -41,12 +41,10 @@ public class AssetService {
                 .category(category)
                 .build());
 
-        AssetCopy copy = AssetCopy.builder()
+        AssetCopy savedCopy = assetCopyRepository.save(AssetCopy.builder()
                 .asset(savedAsset)
                 .state(AssetCopyState.NEW)
-                .build();
-
-        AssetCopy savedCopy = assetCopyRepository.save(copy);
+                .build());
 
         savedAsset.addCopy(savedCopy);
 
@@ -96,7 +94,8 @@ public class AssetService {
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
         // TODO : loop through all asset copies linked to this asset
-        // TODO     and delete them + the asset only if no loan is active
+        // TODO     and delete them + the asset only if none have ever been loaned
+        // TODO     because we want to keep and history of each loan and copy loaned
 
         assetRepository.deleteById(assetId);
     }

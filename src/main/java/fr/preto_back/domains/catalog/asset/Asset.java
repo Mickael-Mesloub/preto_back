@@ -2,7 +2,6 @@ package fr.preto_back.domains.catalog.asset;
 
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
 import fr.preto_back.domains.catalog.category.Category;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -51,7 +50,9 @@ public class Asset {
     @ManyToOne(optional = false)
     private Category category;
 
-    @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
+    // No cascade delete and no orphan removal
+    // because we want to keep an history of all the copies that have been loaned
+    @OneToMany(mappedBy = "asset")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private @Builder.Default List<AssetCopy> copies = new ArrayList<>();
@@ -60,11 +61,5 @@ public class Asset {
     public void addCopy(AssetCopy copy) {
         copies.add(copy);
         copy.setAsset(this);
-    }
-
-    // Method to remove copy from the list of copies
-    public void removeCopy(AssetCopy copy) {
-        copies.remove(copy);
-        copy.setAsset(null);
     }
 }
