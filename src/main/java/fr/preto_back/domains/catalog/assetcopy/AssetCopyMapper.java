@@ -13,6 +13,7 @@ public class AssetCopyMapper {
                 .id(assetCopy.getId())
                 .assetId(assetCopy.getAsset().getId())
                 .state(assetCopy.getState())
+                // TODO: check availability in date range asked for loan
                 .isAvailable(assetCopyHelper.checkCopyAvailableState(assetCopy))
                 .build();
     }

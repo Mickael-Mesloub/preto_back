@@ -39,9 +39,14 @@ public enum ApiCode {
     RESA_INVALID_DECISION("Decision must be either APPROVED or DECLINED"),
     RESA_PROCESS_SUCCESS("Reservation request processed successfully"),
     RESA_RETURN_DATE_BEFORE_OR_EQUALS_START_DATE("Return date cannot be before or equal to start date"),
-    // User
-    USER_NOT_FOUND("User not found");
 
+    // User
+    USER_NOT_FOUND("User not found"),
+
+    // Loan
+    LOAN_NOT_FOUND("Loan not found"),
+    LOAN_NOT_ACTIVE("Only ACTIVE loans can be returned"),
+    LOAN_NOT_PENDING_CHECKOUT("Only PENDING_CHECKOUT loans can be checked out");
 
     private final String message;
 

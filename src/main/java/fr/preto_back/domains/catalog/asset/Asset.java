@@ -62,4 +62,5 @@ public class Asset {
         copies.add(copy);
         copy.setAsset(this);
     }
+
 }
