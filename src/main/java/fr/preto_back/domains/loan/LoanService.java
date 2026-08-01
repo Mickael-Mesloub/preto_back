@@ -8,12 +8,14 @@ import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.resa.ReservationRequest;
 import fr.preto_back.domains.resa.ReservationRequestRepository;
+import fr.preto_back.domains.resa.ReservationRequestStatus;
 import fr.preto_back.domains.user.User;
 import fr.preto_back.domains.user.UserRepository;
 import fr.preto_back.domains.user.UserSummary;
 import fr.preto_back.shared.api_response.ApiCode;
 import fr.preto_back.shared.exception.NotActiveLoanStatusException;
 import fr.preto_back.shared.exception.NotPendingCheckoutLoanStatusException;
+import fr.preto_back.shared.exception.ResaNotApprovedException;
 import fr.preto_back.shared.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,13 +45,19 @@ public class LoanService {
         ReservationRequest existingResa = reservationRequestRepository.findById(resaId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + resaId));
 
-        // Check that loan exists with id
-        Loan existingLoan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
+        // Check if resa APPROVED => if not, exception => Cannot process loan if reservation has not been approved yet
+        if (existingResa.getStatus() != ReservationRequestStatus.APPROVED) {
+            throw new ResaNotApprovedException();
+        }
 
         // Check that asset exists with id
         Asset existingAsset = assetRepository.findById(existingResa.getAssetCopy().getAsset().getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getAsset().getId()));
+
+
+        // Check that loan exists with id
+        Loan existingLoan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
 
         // Check existingLoan status
         // If not PENDING_CHECKOUT, throw exception => only "PENDING_CHECKOUT" loans can be checked out
@@ -102,9 +110,10 @@ public class LoanService {
         ReservationRequest existingResa = reservationRequestRepository.findById(resaId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + resaId));
 
-        // Check that loan exists with id
-        Loan existingLoan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
+        // Check if resa APPROVED => if not, exception => Cannot process loan if reservation has not been approved yet
+        if (existingResa.getStatus() != ReservationRequestStatus.APPROVED) {
+            throw new ResaNotApprovedException();
+        }
 
         // Check that asset exists with id
         Asset existingAsset = assetRepository.findById(existingResa.getAssetCopy().getAsset().getId())
@@ -113,6 +122,11 @@ public class LoanService {
         // Check that asset copy exists with id
         AssetCopy existingAssetCopy =  assetCopyRepository.findById(existingResa.getAssetCopy().getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_COPY_NOT_FOUND, ApiCode.ASSET_COPY_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getId()));
+
+
+        // Check that loan exists with id
+        Loan existingLoan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
 
         // Check existingLoan status
         // If not ACTIVE, throw exception => only "ACTIVE" loans can be returned

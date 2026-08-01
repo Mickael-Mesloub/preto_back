@@ -39,7 +39,7 @@ public enum ApiCode {
     RESA_INVALID_DECISION("Decision must be either APPROVED or DECLINED"),
     RESA_PROCESS_SUCCESS("Reservation request processed successfully"),
     RESA_RETURN_DATE_BEFORE_OR_EQUALS_START_DATE("Return date cannot be before or equal to start date"),
-
+    RESA_NOT_APPROVED("Reservation request must be approved before processing loan"),
     // User
     USER_NOT_FOUND("User not found"),
 

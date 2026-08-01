@@ -130,6 +130,10 @@ public class TestLoanService {
     void testProcessLoanCheckout_KO_Invalid_Loan_Status() {
         // Set loan ACTIVE status, which is invalid, as loan must be in PENDING_CHECKOUT status to process checkout
         loan.setStatus(LoanStatus.ACTIVE);
+
+        // Simulate reservation request approval because it is mandatory to process loan
+        reservationRequest.setStatus(ReservationRequestStatus.APPROVED);
+
         log.info("testProcessLoanCheckout_KO_Invalid_Loan_Status loan={}", loan);
 
         // processLoanCheckout method should throw exception because invalid loan status
@@ -141,6 +145,9 @@ public class TestLoanService {
     @Test
     void testProcessLoanCheckout_OK() {
         log.info("testProcessLoanCheckout_OK BEFORE RESULT loan={}", loan);
+
+        // Simulate reservation request approval because it is mandatory to process loan
+        reservationRequest.setStatus(ReservationRequestStatus.APPROVED);
 
         // Call processLoanCheckout method from loan service
         LoanResponseBody result = loanService.processLoanCheckout(manager.getId(), reservationRequest.getId(), loan.getId());
@@ -159,6 +166,9 @@ public class TestLoanService {
 
         // Set loan status to ACTIVE, which is the only acceptable status
         loan.setStatus(LoanStatus.ACTIVE);
+
+        // Simulate reservation request approval because it is mandatory to process loan
+        reservationRequest.setStatus(ReservationRequestStatus.APPROVED);
 
         // Set request body
         ProcessReturnLoanRequestBody body = ProcessReturnLoanRequestBody.builder()
