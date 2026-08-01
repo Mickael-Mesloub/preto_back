@@ -5,6 +5,7 @@ import fr.preto_back.domains.catalog.asset.AssetRepository;
 import fr.preto_back.domains.catalog.asset.AssetService;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.catalog.category.Category;
 import fr.preto_back.domains.catalog.category.CategoryRepository;
 import fr.preto_back.domains.resa.ReservationRequest;
@@ -31,7 +32,6 @@ import java.time.LocalDateTime;
 @SpringBootTest
 @Transactional
 public class TestLoanService {
-
     // Repositories
     @Autowired
     private AssetRepository assetRepository;
@@ -47,6 +47,9 @@ public class TestLoanService {
 
     @Autowired
     private ReservationRequestRepository reservationRequestRepository;
+
+    @Autowired
+    private LoanRepository loanRepository;
 
     // Services
     @Autowired
@@ -66,8 +69,6 @@ public class TestLoanService {
     private ReservationRequestBody reservationRequestBody;
     private ReservationRequest reservationRequest;
     private Loan loan;
-    @Autowired
-    private LoanRepository loanRepository;
 
     // TODO : extract to make it reusable (also used in TestReservationRequestService)
     @BeforeEach
@@ -85,6 +86,7 @@ public class TestLoanService {
 
         assetCopy = assetCopyRepository.save(AssetCopy.builder()
                 .asset(asset)
+                .state(AssetCopyState.NEW)
                 .build());
 
         requester = userRepository.save(User.builder()
@@ -138,13 +140,42 @@ public class TestLoanService {
 
     @Test
     void testProcessLoanCheckout_OK() {
-        // TODO : write successful test
-        log.info("testProcessLoanCheckout_OK loan={}", loan);
+        log.info("testProcessLoanCheckout_OK BEFORE RESULT loan={}", loan);
+
+        // Call processLoanCheckout method from loan service
+        LoanResponseBody result = loanService.processLoanCheckout(manager.getId(), reservationRequest.getId(), loan.getId());
+
+        log.info("testProcessLoanCheckout_OK AFTER RESULT loan={}", loan);
+
+        // Check that loan status has been updated
+        Assertions.assertThat(result.getStatus()).isEqualTo(LoanStatus.ACTIVE);
+        // Check that actualCheckoutDate has been updated
+        Assertions.assertThat(result.getActualCheckoutDate()).isNotNull();
     }
 
     @Test
     void testProcessReturnLoan_OK() {
-        // TODO : write successful test
+        log.info("testProcessReturnLoan_OK BEFORE RESULT loan={}", loan);
+
+        // Set loan status to ACTIVE, which is the only acceptable status
+        loan.setStatus(LoanStatus.ACTIVE);
+
+        // Set request body
+        ProcessReturnLoanRequestBody body = ProcessReturnLoanRequestBody.builder()
+                .copyState(AssetCopyState.ACCEPTABLE)
+                .build();
+
+        // Call processLoanReturn and store result in variable
+        LoanResponseBody result = loanService.processLoanReturn(manager.getId(), reservationRequest.getId(), loan.getId(), body);
+
+        log.info("testProcessReturnLoan_OK AFTER SERVICE METHOD CALL loan={}", loan);
+
+        // Check that loan status has changed
+        Assertions.assertThat(result.getStatus()).isEqualTo(LoanStatus.RETURNED);
+        // Check that return date has been updated (was null)
+        Assertions.assertThat(result.getActualReturnDate()).isNotNull();
+        // Check that copy state has been updated
+        Assertions.assertThat(result.getAsset().getState()).isEqualTo(body.getCopyState());
     }
 
     // TODO : write processReturnLoan handled error test

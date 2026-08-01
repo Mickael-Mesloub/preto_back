@@ -5,6 +5,7 @@ import fr.preto_back.domains.catalog.asset.AssetRepository;
 import fr.preto_back.domains.catalog.asset.AssetService;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.catalog.category.Category;
 import fr.preto_back.domains.catalog.category.CategoryRepository;
 import fr.preto_back.domains.user.Role;
@@ -73,6 +74,7 @@ public class TestReservationRequestService {
 
         assetCopy = assetCopyRepository.save(AssetCopy.builder()
                 .asset(asset)
+                .state(AssetCopyState.NEW)
                 .build());
 
         requester = userRepository.save(User.builder()
