@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +47,7 @@ public class LoanRestController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}/checkout")
+    @PutMapping("/{id}/checkout")
     public ResponseEntity<ApiResponse<LoanResponseBody>> checkoutLoan(@PathVariable String id) {
         // TODO : replace with auth user
         Integer managerId = 2;
@@ -58,7 +58,7 @@ public class LoanRestController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}/return")
+    @PutMapping("/{id}/return")
     public ResponseEntity<ApiResponse<LoanResponseBody>> returnLoan(
             @PathVariable String id,
             @Valid @RequestBody ProcessReturnLoanRequestBody requestBody

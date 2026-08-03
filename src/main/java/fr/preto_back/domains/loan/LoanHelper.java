@@ -10,6 +10,6 @@ import java.time.LocalDateTime;
 public class LoanHelper {
     // Checks if asset is returned with overdue
     public boolean checkIsLoanOverdue(LocalDateTime plannedReturnDate) {
-        return plannedReturnDate.isAfter(LocalDateTime.now());
+        return plannedReturnDate.isBefore(LocalDateTime.now());
     }
 }
