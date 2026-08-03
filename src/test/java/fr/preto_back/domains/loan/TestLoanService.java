@@ -17,6 +17,7 @@ import fr.preto_back.domains.user.Role;
 import fr.preto_back.domains.user.User;
 import fr.preto_back.domains.user.UserRepository;
 import fr.preto_back.shared.api_response.ApiCode;
+import fr.preto_back.shared.exception.NotActiveLoanStatusException;
 import fr.preto_back.shared.exception.NotPendingCheckoutLoanStatusException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -127,14 +128,14 @@ public class TestLoanService {
     }
 
     @Test
-    void testProcessLoanCheckout_KO_Invalid_Loan_Status() {
+    void testProcessLoanCheckout_KO_LOAN_NOT_PENDING_CHECKOUT() {
         // Set loan ACTIVE status, which is invalid, as loan must be in PENDING_CHECKOUT status to process checkout
         loan.setStatus(LoanStatus.ACTIVE);
 
         // Simulate reservation request approval because it is mandatory to process loan
         reservationRequest.setStatus(ReservationRequestStatus.APPROVED);
 
-        log.info("testProcessLoanCheckout_KO_Invalid_Loan_Status loan={}", loan);
+        log.info("testProcessLoanCheckout_KO_LOAN_NOT_PENDING_CHECKOUT loan={}", loan);
 
         // processLoanCheckout method should throw exception because invalid loan status
         Assertions.assertThatThrownBy(() -> loanService.processLoanCheckout(manager.getId(), reservationRequest.getId(), loan.getId()))
@@ -188,5 +189,21 @@ public class TestLoanService {
         Assertions.assertThat(result.getAsset().getState()).isEqualTo(body.getCopyState());
     }
 
-    // TODO : write processReturnLoan handled error test
+    @Test
+    void testProcessLoanReturn_KO_Loan_Not_Active() {
+        // Simulate reservation request approval because it is mandatory to process loan
+        reservationRequest.setStatus(ReservationRequestStatus.APPROVED);
+
+        // Set request body
+        ProcessReturnLoanRequestBody body = ProcessReturnLoanRequestBody.builder()
+                .copyState(AssetCopyState.ACCEPTABLE)
+                .build();
+
+        log.info("testProcessLoanReturn_KO_Loan_Not_Active loan={}", loan);
+
+        // processLoanReturn method should throw exception because invalid loan status -> can only process ACTIVE loan
+        Assertions.assertThatThrownBy(() -> loanService.processLoanReturn(manager.getId(), reservationRequest.getId(), loan.getId(), body))
+                .isInstanceOf(NotActiveLoanStatusException.class)
+                .hasMessageContaining(ApiCode.LOAN_NOT_ACTIVE.getMessage());
+    }
 }

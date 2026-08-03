@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -34,6 +35,79 @@ public class LoanService {
     private final LoanMapper loanMapper;
     private final AssetRepository assetRepository;
     private final AssetCopyRepository assetCopyRepository;
+
+    public List<LoanResponseBody> findAllLoans(Integer managerId) {
+        // Check that user exists with managerId
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + managerId));
+
+        List<Loan> loans = loanRepository.findAll();
+
+        // Loop through loans and build dto for each loan
+        return loans.stream()
+                .map(l -> {
+                    boolean isOverdue = loanHelper.checkIsLoanOverdue(l.getReservationRequest().getReturnDateAsked());
+
+                    // Create summary of asset/copy information that will be stored in dto and sent in response
+                    AssetSummary assetSummary = AssetSummary.builder()
+                            .assetTitle(l.getReservationRequest().getAssetCopy().getAsset().getTitle())
+                            .assetDescription(l.getReservationRequest().getAssetCopy().getAsset().getDescription())
+                            .state(l.getReservationRequest().getAssetCopy().getState())
+                            .build();
+
+                    // Create user summary with requester information
+                    UserSummary requesterSummary = UserSummary.builder()
+                            .firstName(l.getReservationRequest().getRequester().getFirstName())
+                            .lastName(l.getReservationRequest().getRequester().getLastName())
+                            .email(l.getReservationRequest().getRequester().getEmail())
+                            .build();
+
+                    // Create user summary with manager information
+                    UserSummary managerSummary = UserSummary.builder()
+                            .firstName(l.getReservationRequest().getManager().getFirstName())
+                            .lastName(l.getReservationRequest().getManager().getLastName())
+                            .build();
+                   return loanMapper.toDto(l, assetSummary, requesterSummary, managerSummary, l.getReservationRequest(), isOverdue);
+                })
+                .toList();
+    }
+
+    public LoanResponseBody findById(Integer managerId, Integer loanId) {
+        // Check that user exists with managerId
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + managerId));
+
+        // Check that loan exists with id
+        Loan existingLoan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
+
+
+        // TODO : refactor -> code duplication
+        // Check if loan is overdue
+        boolean isOverdue = loanHelper.checkIsLoanOverdue(existingLoan.getReservationRequest().getReturnDateAsked());
+
+        // Create summary of asset/copy information that will be stored in dto and sent in response
+        AssetSummary assetSummary = AssetSummary.builder()
+                .assetTitle(existingLoan.getReservationRequest().getAssetCopy().getAsset().getTitle())
+                .assetDescription(existingLoan.getReservationRequest().getAssetCopy().getAsset().getDescription())
+                .state(existingLoan.getReservationRequest().getAssetCopy().getState())
+                .build();
+
+        // Create user summary with requester information
+        UserSummary requesterSummary = UserSummary.builder()
+                .firstName(existingLoan.getReservationRequest().getRequester().getFirstName())
+                .lastName(existingLoan.getReservationRequest().getRequester().getLastName())
+                .email(existingLoan.getReservationRequest().getRequester().getEmail())
+                .build();
+
+        // Create user summary with manager information
+        UserSummary managerSummary = UserSummary.builder()
+                .firstName(existingLoan.getReservationRequest().getManager().getFirstName())
+                .lastName(existingLoan.getReservationRequest().getManager().getLastName())
+                .build();
+        return loanMapper.toDto(existingLoan, assetSummary, requesterSummary, managerSummary, existingLoan.getReservationRequest(), isOverdue);
+    }
+
 
     // Process loan checkout : when user comes physically to claim the asset he loaned => Manager processes the checkout
     public LoanResponseBody processLoanCheckout(Integer managerId, Integer resaId, Integer loanId) {
@@ -53,7 +127,6 @@ public class LoanService {
         // Check that asset exists with id
         Asset existingAsset = assetRepository.findById(existingResa.getAssetCopy().getAsset().getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getAsset().getId()));
-
 
         // Check that loan exists with id
         Loan existingLoan = loanRepository.findById(loanId)
@@ -122,7 +195,6 @@ public class LoanService {
         // Check that asset copy exists with id
         AssetCopy existingAssetCopy =  assetCopyRepository.findById(existingResa.getAssetCopy().getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_COPY_NOT_FOUND, ApiCode.ASSET_COPY_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getId()));
-
 
         // Check that loan exists with id
         Loan existingLoan = loanRepository.findById(loanId)

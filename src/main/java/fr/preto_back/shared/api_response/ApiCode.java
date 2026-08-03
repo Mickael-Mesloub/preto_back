@@ -44,6 +44,8 @@ public enum ApiCode {
     USER_NOT_FOUND("User not found"),
 
     // Loan
+    LOAN_FOUND_SUCCESS("Loan found"),
+    LOANS_FOUND_SUCCESS("Loans found"),
     LOAN_NOT_FOUND("Loan not found"),
     LOAN_NOT_ACTIVE("Only ACTIVE loans can be returned"),
     LOAN_NOT_PENDING_CHECKOUT("Only PENDING_CHECKOUT loans can be checked out");
