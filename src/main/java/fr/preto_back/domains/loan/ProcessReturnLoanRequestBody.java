@@ -18,6 +18,6 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class ProcessReturnLoanRequestBody {
-    @NotNull(message = "{VALIDATION_LOAN_COPY_STATE_REQUIRED}")
+    @NotNull(message = "{VALIDATION_COPY_STATE_REQUIRED}")
     private AssetCopyState copyState;
 }

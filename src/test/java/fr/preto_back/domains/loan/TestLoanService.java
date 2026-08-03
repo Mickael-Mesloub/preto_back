@@ -138,7 +138,7 @@ public class TestLoanService {
         log.info("testProcessLoanCheckout_KO_LOAN_NOT_PENDING_CHECKOUT loan={}", loan);
 
         // processLoanCheckout method should throw exception because invalid loan status
-        Assertions.assertThatThrownBy(() -> loanService.processLoanCheckout(manager.getId(), reservationRequest.getId(), loan.getId()))
+        Assertions.assertThatThrownBy(() -> loanService.processLoanCheckout(manager.getId(), loan.getId()))
                 .isInstanceOf(NotPendingCheckoutLoanStatusException.class)
                 .hasMessageContaining(ApiCode.LOAN_NOT_PENDING_CHECKOUT.getMessage());
     }
@@ -151,7 +151,7 @@ public class TestLoanService {
         reservationRequest.setStatus(ReservationRequestStatus.APPROVED);
 
         // Call processLoanCheckout method from loan service
-        LoanResponseBody result = loanService.processLoanCheckout(manager.getId(), reservationRequest.getId(), loan.getId());
+        LoanResponseBody result = loanService.processLoanCheckout(manager.getId(), loan.getId());
 
         log.info("testProcessLoanCheckout_OK AFTER RESULT loan={}", loan);
 
@@ -177,7 +177,7 @@ public class TestLoanService {
                 .build();
 
         // Call processLoanReturn and store result in variable
-        LoanResponseBody result = loanService.processLoanReturn(manager.getId(), reservationRequest.getId(), loan.getId(), body);
+        LoanResponseBody result = loanService.processLoanReturn(manager.getId(), loan.getId(), body);
 
         log.info("testProcessReturnLoan_OK AFTER SERVICE METHOD CALL loan={}", loan);
 
@@ -202,7 +202,7 @@ public class TestLoanService {
         log.info("testProcessLoanReturn_KO_Loan_Not_Active loan={}", loan);
 
         // processLoanReturn method should throw exception because invalid loan status -> can only process ACTIVE loan
-        Assertions.assertThatThrownBy(() -> loanService.processLoanReturn(manager.getId(), reservationRequest.getId(), loan.getId(), body))
+        Assertions.assertThatThrownBy(() -> loanService.processLoanReturn(manager.getId(), loan.getId(), body))
                 .isInstanceOf(NotActiveLoanStatusException.class)
                 .hasMessageContaining(ApiCode.LOAN_NOT_ACTIVE.getMessage());
     }

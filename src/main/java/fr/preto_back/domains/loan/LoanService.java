@@ -110,23 +110,10 @@ public class LoanService {
 
 
     // Process loan checkout : when user comes physically to claim the asset he loaned => Manager processes the checkout
-    public LoanResponseBody processLoanCheckout(Integer managerId, Integer resaId, Integer loanId) {
+    public LoanResponseBody processLoanCheckout(Integer managerId, Integer loanId) {
         // Check that user exists with managerId
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + managerId));
-
-        // Check that resa exists with id
-        ReservationRequest existingResa = reservationRequestRepository.findById(resaId)
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + resaId));
-
-        // Check if resa APPROVED => if not, exception => Cannot process loan if reservation has not been approved yet
-        if (existingResa.getStatus() != ReservationRequestStatus.APPROVED) {
-            throw new ResaNotApprovedException();
-        }
-
-        // Check that asset exists with id
-        Asset existingAsset = assetRepository.findById(existingResa.getAssetCopy().getAsset().getId())
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getAsset().getId()));
 
         // Check that loan exists with id
         Loan existingLoan = loanRepository.findById(loanId)
@@ -137,6 +124,19 @@ public class LoanService {
         if (!existingLoan.getStatus().equals(LoanStatus.PENDING_CHECKOUT)) {
             throw new NotPendingCheckoutLoanStatusException();
         }
+
+        // Check that resa exists with id
+        ReservationRequest existingResa = reservationRequestRepository.findById(existingLoan.getReservationRequest().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + existingLoan.getReservationRequest().getId()));
+
+        // Check if resa APPROVED => if not, exception => Cannot process loan if reservation has not been approved yet
+        if (existingResa.getStatus() != ReservationRequestStatus.APPROVED) {
+            throw new ResaNotApprovedException();
+        }
+
+        // Check that asset exists with id
+        Asset existingAsset = assetRepository.findById(existingResa.getAssetCopy().getAsset().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getAsset().getId()));
 
         // Set loan checkout datetime to now
         existingLoan.setActualCheckoutDate(LocalDateTime.now());
@@ -174,14 +174,24 @@ public class LoanService {
     // TODO : refactor methods above and below -> loads of duplicated code
 
     // Process loan return : when user comes physically to return the asset he loaned => Manager processes the return
-    public LoanResponseBody processLoanReturn(Integer managerId, Integer resaId, Integer loanId, ProcessReturnLoanRequestBody requestBody) {
+    public LoanResponseBody processLoanReturn(Integer managerId, Integer loanId, ProcessReturnLoanRequestBody requestBody) {
         // Check that user exists with managerId
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.USER_NOT_FOUND, ApiCode.USER_NOT_FOUND.getMessage() + " with id " + managerId));
 
+        // Check that loan exists with id
+        Loan existingLoan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
+
+        // Check existingLoan status
+        // If not ACTIVE, throw exception => only "ACTIVE" loans can be returned
+        if (!existingLoan.getStatus().equals(LoanStatus.ACTIVE)) {
+            throw new NotActiveLoanStatusException();
+        }
+
         // Check that resa exists with id
-        ReservationRequest existingResa = reservationRequestRepository.findById(resaId)
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + resaId));
+        ReservationRequest existingResa = reservationRequestRepository.findById(existingLoan.getReservationRequest().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.RESA_NOT_FOUND, ApiCode.RESA_NOT_FOUND.getMessage() + " with id " + existingLoan.getReservationRequest().getId()));
 
         // Check if resa APPROVED => if not, exception => Cannot process loan if reservation has not been approved yet
         if (existingResa.getStatus() != ReservationRequestStatus.APPROVED) {
@@ -195,16 +205,6 @@ public class LoanService {
         // Check that asset copy exists with id
         AssetCopy existingAssetCopy =  assetCopyRepository.findById(existingResa.getAssetCopy().getId())
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_COPY_NOT_FOUND, ApiCode.ASSET_COPY_NOT_FOUND.getMessage() + " with id " + existingResa.getAssetCopy().getId()));
-
-        // Check that loan exists with id
-        Loan existingLoan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.LOAN_NOT_FOUND, ApiCode.LOAN_NOT_FOUND.getMessage() + " with id " + loanId));
-
-        // Check existingLoan status
-        // If not ACTIVE, throw exception => only "ACTIVE" loans can be returned
-        if (!existingLoan.getStatus().equals(LoanStatus.ACTIVE)) {
-            throw new NotActiveLoanStatusException();
-        }
 
         // Check if overdue (create helper method for this)
         // If overdue, loanResponseBody.isOverdue() = true
