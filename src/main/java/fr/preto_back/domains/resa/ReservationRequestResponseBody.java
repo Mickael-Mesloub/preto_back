@@ -1,5 +1,7 @@
 package fr.preto_back.domains.resa;
 
+import fr.preto_back.domains.catalog.asset.AssetSummary;
+import fr.preto_back.domains.user.UserSummary;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -19,11 +21,11 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 public class ReservationRequestResponseBody {
     Integer id;
-    Integer assetCopyId;
-    Integer requesterId;
+    AssetSummary asset;
+    UserSummary requester;
     LocalDateTime startDateAsked;
     LocalDateTime returnDateAsked;
     ReservationRequestStatus status;
     String declineReason;
-    Integer managerId;
+    UserSummary manager;
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -45,6 +46,14 @@ public class ReservationRequestRestController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ReservationRequestResponseBody>>> getReservationRequestsByStatus(@RequestParam ReservationRequestStatus status) {
+        List<ReservationRequestResponseBody> reservationRequests = reservationRequestService.findReservationRequestsByStatus(status);
+        ApiResponse<List<ReservationRequestResponseBody>> response = ApiResponse.success(ApiCode.RESAS_FOUND_SUCCESS.name(), ApiCode.RESAS_FOUND_SUCCESS.getMessage(), reservationRequests);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}/process")
     public ResponseEntity<ApiResponse<ReservationRequestResponseBody>> processReservationRequest(@PathVariable String id, @RequestBody ProcessReservationRequestBody body) {
         // TODO: replace with auth userId
@@ -54,6 +63,5 @@ public class ReservationRequestRestController {
         ApiResponse<ReservationRequestResponseBody> response = ApiResponse.success(ApiCode.RESA_PROCESS_SUCCESS.name(), ApiCode.RESA_PROCESS_SUCCESS.getMessage(), reservationRequest);
 
         return ResponseEntity.ok(response);
-
     }
 }

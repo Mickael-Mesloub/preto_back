@@ -2,6 +2,7 @@ package fr.preto_back.domains.resa;
 
 import fr.preto_back.domains.catalog.asset.Asset;
 import fr.preto_back.domains.catalog.asset.AssetRepository;
+import fr.preto_back.domains.catalog.asset.AssetSummary;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyHelper;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
@@ -9,6 +10,7 @@ import fr.preto_back.domains.loan.Loan;
 import fr.preto_back.domains.loan.LoanRepository;
 import fr.preto_back.domains.user.User;
 import fr.preto_back.domains.user.UserRepository;
+import fr.preto_back.domains.user.UserSummary;
 import fr.preto_back.shared.api_response.ApiCode;
 import fr.preto_back.shared.exception.DeclineReasonMissingException;
 import fr.preto_back.shared.exception.InvalidDecisionException;
@@ -75,8 +77,22 @@ public class ReservationRequestService {
                 .manager(null)
                 .build());
 
+        // Create summary of asset/copy information that will be stored in dto and sent in response
+        AssetSummary assetSummary = AssetSummary.builder()
+                .assetTitle(existingAsset.getTitle())
+                .assetDescription(existingAsset.getDescription())
+                .state(firstAvailableCopy.get().getState())
+                .build();
+
+        // Create user summary with requester information
+        UserSummary requesterSummary = UserSummary.builder()
+                .firstName(requester.getFirstName())
+                .lastName(requester.getLastName())
+                .email(requester.getEmail())
+                .build();
+
         // Map entity to dto and send dto to controller
-        return mapper.toDto(reservationRequest, ReservationRequestStatus.PENDING, null);
+        return mapper.toDto(reservationRequest, assetSummary, requesterSummary);
     }
 
     // TODO : check auth user role == MANAGER || ADMIN
@@ -84,16 +100,49 @@ public class ReservationRequestService {
         List<ReservationRequest> reservationRequests = reservationRequestRepository.findAll();
 
         return reservationRequests.stream()
-                .map(mapper::toDto)
+                .map(r -> {
+                    // Create summary of asset/copy information that will be stored in dto and sent in response
+                    AssetSummary assetSummary = AssetSummary.builder()
+                            .assetTitle(r.getAssetCopy().getAsset().getTitle())
+                            .assetDescription(r.getAssetCopy().getAsset().getDescription())
+                            .state(r.getAssetCopy().getState())
+                            .build();
+
+                    // Create user summary with requester information
+                    UserSummary requesterSummary = UserSummary.builder()
+                            .firstName(r.getRequester().getFirstName())
+                            .lastName(r.getRequester().getLastName())
+                            .email(r.getRequester().getEmail())
+                            .build();
+
+                    return mapper.toDto(r, assetSummary, requesterSummary);
+                })
                 .toList();
     }
 
     // TODO : check auth user role == MANAGER || ADMIN
+    // TODO : check that status value we receive corresponds to an existing ReservationRequestStatus
     public List<ReservationRequestResponseBody> findReservationRequestsByStatus(ReservationRequestStatus status) {
         List<ReservationRequest> reservationRequests = reservationRequestRepository.findReservationRequestByStatusIs(status);
 
         return reservationRequests.stream()
-                .map(mapper::toDto)
+                .map(r -> {
+                    // Create summary of asset/copy information that will be stored in dto and sent in response
+                    AssetSummary assetSummary = AssetSummary.builder()
+                            .assetTitle(r.getAssetCopy().getAsset().getTitle())
+                            .assetDescription(r.getAssetCopy().getAsset().getDescription())
+                            .state(r.getAssetCopy().getState())
+                            .build();
+
+                    // Create user summary with requester information
+                    UserSummary requesterSummary = UserSummary.builder()
+                            .firstName(r.getRequester().getFirstName())
+                            .lastName(r.getRequester().getLastName())
+                            .email(r.getRequester().getEmail())
+                            .build();
+
+                    return mapper.toDto(r, assetSummary, requesterSummary);
+                })
                 .toList();
     }
 
@@ -156,8 +205,29 @@ public class ReservationRequestService {
             log.info("New loan has been created: {}", newLoan);
         }
 
+        // Create summary of asset/copy information that will be stored in dto and sent in response
+        AssetSummary assetSummary = AssetSummary.builder()
+                .assetTitle(updatedResa.getAssetCopy().getAsset().getTitle())
+                .assetDescription(updatedResa.getAssetCopy().getAsset().getDescription())
+                .state(updatedResa.getAssetCopy().getState())
+                .build();
+
+        // Create user summary with requester information
+        UserSummary requesterSummary = UserSummary.builder()
+                .firstName(requester.getFirstName())
+                .lastName(requester.getLastName())
+                .email(requester.getEmail())
+                .build();
+
+        // Create user summary with manager information
+        UserSummary managerSummary = UserSummary.builder()
+                .firstName(manager.getFirstName())
+                .lastName(manager.getLastName())
+                .email(manager.getEmail())
+                .build();
+
         // Return updated DTO
-        return mapper.toDto(updatedResa, updatedResa.getStatus(), updatedResa.getDeclineReason());
+        return mapper.toDto(updatedResa, assetSummary, requesterSummary, managerSummary, updatedResa.getStatus(), updatedResa.getDeclineReason());
     }
 
 }
