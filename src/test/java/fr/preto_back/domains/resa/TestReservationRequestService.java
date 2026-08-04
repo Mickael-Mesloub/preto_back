@@ -145,7 +145,7 @@ public class TestReservationRequestService {
 
         // Manager is null by default when a new request is sent.
         // It should have been updated and should now contain manager's data
-        Assertions.assertThat(processedResa.managerId).isEqualTo(manager.getId());
+        Assertions.assertThat(processedResa.getManager().getEmail()).isEqualTo(manager.getEmail());
 
         // Resa status should have been updated from PENDING to APPROVED
         Assertions.assertThat(processedResa.status).isEqualTo(ReservationRequestStatus.APPROVED);
