@@ -66,7 +66,9 @@ public class LoanService {
                     UserSummary managerSummary = UserSummary.builder()
                             .firstName(l.getReservationRequest().getManager().getFirstName())
                             .lastName(l.getReservationRequest().getManager().getLastName())
+                            .email(l.getReservationRequest().getManager().getEmail())
                             .build();
+
                    return loanMapper.toDto(l, assetSummary, requesterSummary, managerSummary, l.getReservationRequest(), isOverdue);
                 })
                 .toList();
@@ -104,7 +106,9 @@ public class LoanService {
         UserSummary managerSummary = UserSummary.builder()
                 .firstName(existingLoan.getReservationRequest().getManager().getFirstName())
                 .lastName(existingLoan.getReservationRequest().getManager().getLastName())
+                .email(existingLoan.getReservationRequest().getManager().getEmail())
                 .build();
+
         return loanMapper.toDto(existingLoan, assetSummary, requesterSummary, managerSummary, existingLoan.getReservationRequest(), isOverdue);
     }
 
@@ -165,6 +169,7 @@ public class LoanService {
         UserSummary managerSummary = UserSummary.builder()
                 .firstName(existingResa.getManager().getFirstName())
                 .lastName(existingResa.getManager().getLastName())
+                .email(existingResa.getManager().getEmail())
                 .build();
 
         // Map to dto and return it
@@ -249,6 +254,7 @@ public class LoanService {
         UserSummary managerSummary = UserSummary.builder()
                 .firstName(existingResa.getManager().getFirstName())
                 .lastName(existingResa.getManager().getLastName())
+                .email(existingResa.getManager().getEmail())
                 .build();
 
         // Map to dto and return it
