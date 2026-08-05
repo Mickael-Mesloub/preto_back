@@ -1,9 +1,11 @@
 package fr.preto_back.domains.catalog.asset;
 
+import fr.preto_back.domains.resa.ReservationRequestBody;
 import fr.preto_back.shared.api_response.ApiCode;
 import fr.preto_back.shared.api_response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,9 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME;
 
 @RestController
 @CrossOrigin
@@ -46,6 +52,27 @@ public class AssetRestController {
     public ResponseEntity<ApiResponse<AssetResponseBody>> getAssetById(@PathVariable String id) {
         AssetResponseBody asset = assetService.findAssetById(Integer.parseInt(id.trim()));
         ApiResponse<AssetResponseBody> response = ApiResponse.success(ApiCode.ASSET_FOUND_SUCCESS.name(),  ApiCode.ASSET_FOUND_SUCCESS.getMessage(), asset);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/check-availability")
+    public ResponseEntity<ApiResponse<CheckAvailabilityResponseBody>> checkAvailability(
+            @PathVariable String id,
+            @RequestParam(name = "startDate") @DateTimeFormat(iso = DATE_TIME) LocalDateTime startDate,
+            @RequestParam(name = "returnDate") @DateTimeFormat(iso = DATE_TIME) LocalDateTime returnDate
+    ) {
+        CheckAvailabilityResponseBody checkAvailability = assetService.checkAvailability(Integer.parseInt(id.trim()), ReservationRequestBody.builder()
+                .startDate(startDate)
+                .returnDate(returnDate)
+                .build()
+        );
+
+        // Send a different response and message depending on availability
+        ApiResponse<CheckAvailabilityResponseBody> response =
+                checkAvailability.isAvailable()
+                ? ApiResponse.success(ApiCode.ASSET_COPY_AVAILABLE.name(), ApiCode.ASSET_COPY_AVAILABLE.getMessage(), checkAvailability)
+                : ApiResponse.success(ApiCode.ASSET_NO_COPY_AVAILABLE.name(), ApiCode.ASSET_NO_COPY_AVAILABLE.getMessage(), checkAvailability);
 
         return ResponseEntity.ok(response);
     }

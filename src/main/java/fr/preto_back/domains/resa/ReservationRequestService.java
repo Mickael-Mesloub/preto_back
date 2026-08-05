@@ -6,6 +6,7 @@ import fr.preto_back.domains.catalog.asset.AssetSummary;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyHelper;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
+import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.loan.Loan;
 import fr.preto_back.domains.loan.LoanRepository;
 import fr.preto_back.domains.user.User;
@@ -57,13 +58,9 @@ public class ReservationRequestService {
             throw new ReturnDateIsBeforeOrEqualsStartDateException();
         }
 
-        // Retrieve all the existing asset copies
-        List<AssetCopy> copies = assetCopyRepository.findAllByAssetId(existingAsset.getId());
+        List<AssetCopy>availableCopies = assetCopyRepository.findAvailableCopies(assetId, reservationRequestBody.getStartDate(), reservationRequestBody.getReturnDate(), List.of(AssetCopyState.MAINTENANCE, AssetCopyState.LOST, AssetCopyState.RETIRED), List.of(ReservationRequestStatus.PENDING, ReservationRequestStatus.APPROVED));
+        Optional<AssetCopy> firstAvailableCopy = availableCopies.stream().findFirst();
 
-        // Loop through copies and check if there is an available copy of this asset in range between startDate and returnDate AND in a decent physical state
-        Optional<AssetCopy> firstAvailableCopy = assetCopyHelper.getFirstAvailableAssetCopy(copies);
-
-        // Throw exception if no available copy was found
         if (firstAvailableCopy.isEmpty()) {
             throw new NoAvailableCopyException(ApiCode.ASSET_COPY_NO_AVAILABLE_COPY.getMessage() + " for asset with id " + assetId);
         }

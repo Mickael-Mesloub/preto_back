@@ -1,12 +1,13 @@
 package fr.preto_back.domains.catalog.asset;
 
 import fr.preto_back.domains.catalog.assetcopy.AssetCopy;
-import fr.preto_back.domains.catalog.assetcopy.AssetCopyMapper;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyRepository;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyService;
 import fr.preto_back.domains.catalog.assetcopy.AssetCopyState;
 import fr.preto_back.domains.catalog.category.Category;
 import fr.preto_back.domains.catalog.category.CategoryRepository;
+import fr.preto_back.domains.resa.ReservationRequestBody;
+import fr.preto_back.domains.resa.ReservationRequestStatus;
 import fr.preto_back.shared.api_response.ApiCode;
 import fr.preto_back.shared.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static fr.preto_back.utils.StringUtils.trimOrNull;
 
@@ -26,7 +28,6 @@ public class AssetService {
     private final CategoryRepository categoryRepository;
     private final AssetCopyService assetCopyService;
     private final AssetMapper assetMapper;
-    private final AssetCopyMapper assetCopyMapper;
 
     // TODO : Check auth + role
     public AssetResponseBody createAsset(AssetRequestBody assetRequestBody) {
@@ -63,6 +64,18 @@ public class AssetService {
                 .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
 
         return assetMapper.toDto(asset);
+    }
+
+    public CheckAvailabilityResponseBody checkAvailability(Integer assetId, ReservationRequestBody body) {
+        Asset existingAsset = assetRepository.findById(assetId)
+                .orElseThrow(() -> new ResourceNotFoundException(ApiCode.ASSET_NOT_FOUND, ApiCode.ASSET_NOT_FOUND.getMessage() + " with id " + assetId));
+
+        // TODO : validate dates (not in past, startDate is before returnDate...)
+
+        List<AssetCopy> availableCopies = assetCopyRepository.findAvailableCopies(assetId, body.getStartDate(), body.getReturnDate(), List.of(AssetCopyState.MAINTENANCE, AssetCopyState.LOST, AssetCopyState.RETIRED), List.of(ReservationRequestStatus.PENDING, ReservationRequestStatus.APPROVED));
+        Optional<AssetCopy> firstAvailableCopy = availableCopies.stream().findFirst();
+
+        return CheckAvailabilityResponseBody.builder().isAvailable(firstAvailableCopy.isPresent()).build();
     }
 
     // TODO : Check auth + role

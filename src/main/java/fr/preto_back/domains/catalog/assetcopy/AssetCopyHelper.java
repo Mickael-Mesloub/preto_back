@@ -17,10 +17,8 @@ public class AssetCopyHelper {
                 && assetCopy.getState() != AssetCopyState.LOST;
     }
 
-    // Return the first available copy depending on physical state and resa/loan dates asked
-    // TODO: check date range availability
-    public Optional<AssetCopy> getFirstAvailableAssetCopy(List<AssetCopy> copies) {
-
+    // Returns the first available copy depending on physical state
+    public Optional<AssetCopy> getFirstAvailableAssetCopyInDecentState(List<AssetCopy> copies) {
         return copies.stream()
                 .filter(this::checkCopyAvailableState)
                 .findFirst();

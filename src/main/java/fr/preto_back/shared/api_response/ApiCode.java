@@ -19,6 +19,8 @@ public enum ApiCode {
     ASSET_DELETE_SUCCESS("Asset deleted successfully"),
     ASSETS_FOUND_SUCCESS("Assets found"),
     ASSET_FOUND_SUCCESS("Asset found"),
+    ASSET_NO_COPY_AVAILABLE("No copy of this asset is available in the datetime range provided"),
+    ASSET_COPY_AVAILABLE("At least one copy of this asset is available for reservation"),
 
     // AssetCopy
     ASSET_COPY_NOT_FOUND("Asset copy not found"),
